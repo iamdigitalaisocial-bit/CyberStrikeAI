@@ -235,6 +235,14 @@ knowledge:
 # 用于在手机端通过企业微信/钉钉/飞书与 CyberStrikeAI 对话，无需部署在服务器上也可使用
 # 在系统设置 -> 机器人设置 中可配置
 robots:
+  wechat: # 微信 iLink（个人微信 ClawBot，扫码绑定）
+    enabled: false
+    bot_token: ""
+    ilink_bot_id: ""
+    ilink_user_id: ""
+    base_url: https://ilinkai.weixin.qq.com
+    bot_type: "3"
+    bot_agent: CyberStrikeAI/1.0
   wecom: # 企业微信
     enabled: false
     token: ""
