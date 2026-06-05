@@ -575,8 +575,8 @@ async function loadProjectFacts() {
             ? `<span class="projects-fact-vuln-link" title="${escapeHtml(tp('projects.relatedVulnIdTitle'))}">${escapeHtml(f.related_vulnerability_id.slice(0, 8))}…</span>`
             : '';
         return `<tr>
-            <td><code>${keyEsc}</code>${vulnLink}</td>
-            <td>${formatCategoryBadge(f.category)}</td>
+            <td class="cell-fact-key"><code class="projects-fact-key-chip" title="${keyEsc}">${keyEsc}</code>${vulnLink}</td>
+            <td class="cell-fact-category">${formatCategoryBadge(f.category)}</td>
             <td class="cell-summary" title="${escapeHtml(f.summary)}">${escapeHtml(f.summary)}</td>
             <td>${formatFactBodyBadge(f)}</td>
             <td>${formatConfidenceBadge(f.confidence)}</td>

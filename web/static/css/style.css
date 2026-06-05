@@ -22185,6 +22185,28 @@ button.chat-files-dropdown-item:hover:not(:disabled) {
 .projects-panel-toolbar--hint .projects-fact-toolbar-hint {
     margin: 0;
 }
+#project-panel-facts .data-table--projects th:nth-child(1) { width: 20%; }
+#project-panel-facts .data-table--projects th:nth-child(2) { width: 9%; }
+#project-panel-facts .data-table--projects th:nth-child(3) { width: 30%; }
+#project-panel-facts .data-table--projects th:nth-child(4) { width: 9%; }
+#project-panel-facts .data-table--projects th:nth-child(5) { width: 10%; }
+#project-panel-facts .data-table--projects th:nth-child(6) { width: 10%; }
+#project-panel-facts .data-table--projects .cell-fact-key {
+    overflow: hidden;
+    max-width: 0;
+}
+#project-panel-facts .data-table--projects .cell-fact-category {
+    white-space: nowrap;
+}
+#project-panel-facts .projects-fact-key-chip {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: top;
+    box-sizing: border-box;
+}
 #project-panel-conversations .data-table--projects th:nth-child(1),
 #project-panel-conversations .data-table--projects td:nth-child(1) {
     width: 48%;
