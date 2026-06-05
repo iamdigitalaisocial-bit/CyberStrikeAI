@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"encoding/json"
+	"sort"
 	"strings"
 	"time"
 
@@ -500,23 +501,24 @@ type CallsTimelineBucket struct {
 	Failed     int
 }
 
+// truncateCallsTimelineBucket 将时间截断到趋势图桶边界（本地时区，与 handler 侧 truncateToBucket 一致）
+func truncateCallsTimelineBucket(t time.Time, dailyBuckets bool) time.Time {
+	t = t.In(time.Local)
+	if dailyBuckets {
+		y, m, d := t.Date()
+		return time.Date(y, m, d, 0, 0, 0, 0, time.Local)
+	}
+	return t.Truncate(time.Hour)
+}
+
 // LoadCallsTimeline 按时间范围加载调用趋势（since 起至今，含边界）
 func (db *DB) LoadCallsTimeline(since time.Time, dailyBuckets bool) ([]CallsTimelineBucket, error) {
-	var bucketExpr string
-	if dailyBuckets {
-		bucketExpr = `strftime('%Y-%m-%d 00:00:00', start_time)`
-	} else {
-		bucketExpr = `strftime('%Y-%m-%d %H:00:00', start_time)`
-	}
-
+	// 在 Go 侧按本地时区分桶，避免 SQLite strftime 对 UTC 存储时间分桶后再误当本地时间解析（差 8h 等问题）
 	query := `
-		SELECT ` + bucketExpr + ` AS bucket,
-			COUNT(*) AS total,
-			SUM(CASE WHEN status IN ('failed', 'cancelled') THEN 1 ELSE 0 END) AS failed
+		SELECT start_time,
+			CASE WHEN status IN ('failed', 'cancelled') THEN 1 ELSE 0 END AS failed
 		FROM tool_executions
 		WHERE start_time >= ?
-		GROUP BY bucket
-		ORDER BY bucket ASC
 	`
 
 	rows, err := db.Query(query, since)
@@ -525,28 +527,32 @@ func (db *DB) LoadCallsTimeline(since time.Time, dailyBuckets bool) ([]CallsTime
 	}
 	defer rows.Close()
 
-	var buckets []CallsTimelineBucket
+	bucketMap := make(map[time.Time]struct{ total, failed int })
 	for rows.Next() {
-		var bucketStr string
-		var total, failed int
-		if err := rows.Scan(&bucketStr, &total, &failed); err != nil {
+		var startTime time.Time
+		var failed int
+		if err := rows.Scan(&startTime, &failed); err != nil {
 			db.logger.Warn("加载调用趋势失败", zap.Error(err))
 			continue
 		}
-		t, parseErr := time.ParseInLocation("2006-01-02 15:04:05", bucketStr, time.Local)
-		if parseErr != nil {
-			t, parseErr = time.Parse("2006-01-02 15:04:05", bucketStr)
-			if parseErr != nil {
-				db.logger.Warn("解析趋势时间桶失败", zap.String("bucket", bucketStr), zap.Error(parseErr))
-				continue
-			}
-		}
+		key := truncateCallsTimelineBucket(startTime, dailyBuckets)
+		entry := bucketMap[key]
+		entry.total++
+		entry.failed += failed
+		bucketMap[key] = entry
+	}
+
+	buckets := make([]CallsTimelineBucket, 0, len(bucketMap))
+	for bucketTime, counts := range bucketMap {
 		buckets = append(buckets, CallsTimelineBucket{
-			BucketTime: t,
-			Total:      total,
-			Failed:     failed,
+			BucketTime: bucketTime,
+			Total:      counts.total,
+			Failed:     counts.failed,
 		})
 	}
+	sort.Slice(buckets, func(i, j int) bool {
+		return buckets[i].BucketTime.Before(buckets[j].BucketTime)
+	})
 	return buckets, nil
 }
 
