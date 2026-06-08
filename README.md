@@ -190,13 +190,14 @@ The `run.sh` script will automatically:
      ```
    - Or edit `config.yaml` directly before launching
 2. **Login** - Use the auto-generated password shown in the console (or set `auth.password` in `config.yaml`)
-3. **Install security tools (optional)** - Install tools as needed:
+3. **Install security tools (optional)** - Install all tools declared under `tools/`:
    ```bash
-   # macOS
-   brew install nmap sqlmap nuclei httpx gobuster feroxbuster subfinder amass
-   # Ubuntu/Debian
-   sudo apt-get install nmap sqlmap nuclei httpx gobuster feroxbuster
+   ./install-tools.sh              # install missing tools (best on Kali/Debian/Ubuntu)
+   ./install-tools.sh --check      # check only, no install
+   ./install-tools.sh --list       # show per-tool status
+   ./install-tools.sh --only nmap,gau   # install selected tools only
    ```
+   On macOS, install bash 4+ via Homebrew first; without apt, the script falls back to pip/go/GitHub.
    AI automatically falls back to alternatives when a tool is missing.
 
 **Alternative Launch Methods:**
