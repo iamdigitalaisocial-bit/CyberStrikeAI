@@ -1075,6 +1075,7 @@ func setupRoutes(
 		protected.DELETE("/vulnerabilities/:id", vulnerabilityHandler.DeleteVulnerability)
 
 		// 项目管理与事实黑板
+		protected.GET("/projects/dashboard-summary", projectHandler.GetDashboardSummary)
 		protected.GET("/projects", projectHandler.ListProjects)
 		protected.POST("/projects", projectHandler.CreateProject)
 		protected.GET("/projects/:id/stats", projectHandler.GetProjectStats)
