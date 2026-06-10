@@ -278,44 +278,6 @@ func (h *ProjectHandler) ListFacts(c *gin.Context) {
 	c.JSON(http.StatusOK, list)
 }
 
-// GetFactPreviousVersion GET /api/projects/:id/facts/:factId/previous-version
-func (h *ProjectHandler) GetFactPreviousVersion(c *gin.Context) {
-	existing, err := h.db.GetProjectFact(c.Param("factId"))
-	if err != nil || existing.ProjectID != c.Param("id") {
-		c.JSON(http.StatusNotFound, gin.H{"error": "事实不存在"})
-		return
-	}
-	if strings.TrimSpace(existing.SupersedesFactID) == "" {
-		c.JSON(http.StatusNotFound, gin.H{"error": "无上一版本"})
-		return
-	}
-	v, err := h.db.GetProjectFactVersion(existing.SupersedesFactID)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, v)
-}
-
-// ListFactVersions GET /api/projects/:id/facts/:factId/versions
-func (h *ProjectHandler) ListFactVersions(c *gin.Context) {
-	existing, err := h.db.GetProjectFact(c.Param("factId"))
-	if err != nil || existing.ProjectID != c.Param("id") {
-		c.JSON(http.StatusNotFound, gin.H{"error": "事实不存在"})
-		return
-	}
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
-	list, err := h.db.ListProjectFactVersions(existing.ID, limit)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	if list == nil {
-		list = []*database.ProjectFactVersion{}
-	}
-	c.JSON(http.StatusOK, list)
-}
-
 // CreateFact POST /api/projects/:id/facts
 func (h *ProjectHandler) CreateFact(c *gin.Context) {
 	var req upsertFactRequest

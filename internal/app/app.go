@@ -1084,8 +1084,6 @@ func setupRoutes(
 		protected.PUT("/projects/:id", projectHandler.UpdateProject)
 		protected.DELETE("/projects/:id", projectHandler.DeleteProject)
 		protected.GET("/projects/:id/facts", projectHandler.ListFacts)
-		protected.GET("/projects/:id/facts/:factId/previous-version", projectHandler.GetFactPreviousVersion)
-		protected.GET("/projects/:id/facts/:factId/versions", projectHandler.ListFactVersions)
 		protected.POST("/projects/:id/facts", projectHandler.CreateFact)
 		protected.PUT("/projects/:id/facts/:factId", projectHandler.UpdateFact)
 		protected.DELETE("/projects/:id/facts/:factId", projectHandler.DeleteFact)

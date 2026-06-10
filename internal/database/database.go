@@ -334,31 +334,11 @@ func (db *DB) initTables() error {
 		source_conversation_id TEXT,
 		source_message_id TEXT,
 		pinned INTEGER NOT NULL DEFAULT 0,
-		supersedes_fact_id TEXT,
 		related_vulnerability_id TEXT,
 		created_at DATETIME NOT NULL,
 		updated_at DATETIME NOT NULL,
 		FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
 		UNIQUE(project_id, fact_key)
-	);`
-
-	createProjectFactVersionsTable := `
-	CREATE TABLE IF NOT EXISTS project_fact_versions (
-		id TEXT PRIMARY KEY,
-		fact_id TEXT NOT NULL,
-		project_id TEXT NOT NULL,
-		fact_key TEXT NOT NULL,
-		category TEXT NOT NULL DEFAULT 'note',
-		summary TEXT NOT NULL DEFAULT '',
-		body TEXT,
-		confidence TEXT NOT NULL DEFAULT 'tentative',
-		source_conversation_id TEXT,
-		source_message_id TEXT,
-		pinned INTEGER NOT NULL DEFAULT 0,
-		related_vulnerability_id TEXT,
-		archived_at DATETIME NOT NULL,
-		FOREIGN KEY (fact_id) REFERENCES project_facts(id) ON DELETE CASCADE,
-		FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
 	);`
 
 	// 创建漏洞表
@@ -598,7 +578,6 @@ func (db *DB) initTables() error {
 	CREATE INDEX IF NOT EXISTS idx_project_facts_project_id ON project_facts(project_id);
 	CREATE INDEX IF NOT EXISTS idx_project_facts_confidence ON project_facts(confidence);
 	CREATE INDEX IF NOT EXISTS idx_project_facts_related_vuln ON project_facts(related_vulnerability_id);
-	CREATE INDEX IF NOT EXISTS idx_project_fact_versions_fact_id ON project_fact_versions(fact_id);
 	CREATE INDEX IF NOT EXISTS idx_conversations_project_id ON conversations(project_id);
 	CREATE INDEX IF NOT EXISTS idx_vulnerabilities_project_id ON vulnerabilities(project_id);
 	CREATE INDEX IF NOT EXISTS idx_batch_tasks_queue_id ON batch_tasks(queue_id);
@@ -680,10 +659,6 @@ func (db *DB) initTables() error {
 		return fmt.Errorf("创建project_facts表失败: %w", err)
 	}
 
-	if _, err := db.Exec(createProjectFactVersionsTable); err != nil {
-		return fmt.Errorf("创建project_fact_versions表失败: %w", err)
-	}
-
 	if _, err := db.Exec(createVulnerabilitiesTable); err != nil {
 		return fmt.Errorf("创建vulnerabilities表失败: %w", err)
 	}
@@ -754,8 +729,8 @@ func (db *DB) initTables() error {
 	if err := db.migrateProjectsTable(); err != nil {
 		db.logger.Warn("迁移projects相关表失败", zap.Error(err))
 	}
-	if err := db.migrateProjectFactVersionsTable(); err != nil {
-		db.logger.Warn("迁移project_fact_versions表失败", zap.Error(err))
+	if err := db.dropProjectFactVersionsTable(); err != nil {
+		db.logger.Warn("清理project_fact_versions表失败", zap.Error(err))
 	}
 
 	if err := db.migrateWebshellConnectionsTable(); err != nil {
@@ -1153,32 +1128,10 @@ func (db *DB) migrateProjectsTable() error {
 	return nil
 }
 
-// migrateProjectFactVersionsTable 为已有库创建事实版本表。
-func (db *DB) migrateProjectFactVersionsTable() error {
-	ddl := `
-	CREATE TABLE IF NOT EXISTS project_fact_versions (
-		id TEXT PRIMARY KEY,
-		fact_id TEXT NOT NULL,
-		project_id TEXT NOT NULL,
-		fact_key TEXT NOT NULL,
-		category TEXT NOT NULL DEFAULT 'note',
-		summary TEXT NOT NULL DEFAULT '',
-		body TEXT,
-		confidence TEXT NOT NULL DEFAULT 'tentative',
-		source_conversation_id TEXT,
-		source_message_id TEXT,
-		pinned INTEGER NOT NULL DEFAULT 0,
-		related_vulnerability_id TEXT,
-		archived_at DATETIME NOT NULL,
-		FOREIGN KEY (fact_id) REFERENCES project_facts(id) ON DELETE CASCADE,
-		FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
-	);`
-	if _, err := db.Exec(ddl); err != nil {
-		return err
-	}
-	_, _ = db.Exec(`CREATE INDEX IF NOT EXISTS idx_project_fact_versions_fact_id ON project_fact_versions(fact_id)`)
-	_, _ = db.Exec(`CREATE INDEX IF NOT EXISTS idx_project_facts_related_vuln ON project_facts(related_vulnerability_id)`)
-	return nil
+// dropProjectFactVersionsTable 移除已废弃的事实版本归档表。
+func (db *DB) dropProjectFactVersionsTable() error {
+	_, err := db.Exec(`DROP TABLE IF EXISTS project_fact_versions`)
+	return err
 }
 
 // migrateVulnerabilitiesTable 迁移 vulnerabilities 表，补充标签字段
