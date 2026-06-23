@@ -2580,6 +2580,8 @@
     "agentModeSingle": "Single-agent (Eino ADK)",
     "agentModeMulti": "Multi-agent (Eino)",
     "agentModeHint": "Same as chat: Eino single-agent (ADK), or Deep / Plan-Execute / Supervisor (last three require multi_agent.enabled).",
+    "concurrency": "Concurrency",
+    "concurrencyHint": "Number of subtasks to run in parallel (1-8). Default 1 is serial; use 1-2 for scan-heavy tasks.",
     "scheduleMode": "Schedule mode",
     "scheduleModeManual": "Manual",
     "scheduleModeCron": "Cron expression",
@@ -2594,8 +2596,8 @@
     "tasksList": "Task list (one task per line)",
     "tasksListPlaceholder": "Enter task list, one per line",
     "tasksListPlaceholderExample": "Enter task list, one per line, for example:\nScan open ports of 192.168.1.1\nCheck if https://example.com has SQL injection\nEnumerate subdomains of example.com",
-    "tasksListHint": "Enter one task command per line; the system will execute them in order. Empty lines are ignored.",
-    "tasksListHintFull": "Hint: Enter one task command per line; the system will execute these tasks in order. Empty lines are ignored.",
+    "tasksListHint": "Enter one task command per line; the system runs them via a concurrency pool. Empty lines are ignored.",
+    "tasksListHintFull": "Hint: Enter one task command per line; the system runs them via a concurrency pool. Empty lines are ignored.",
     "createQueue": "Create queue"
   },
   "batchQueueDetailModal": {
@@ -2629,6 +2631,8 @@
     "scheduleToggleFailed": "Failed to update schedule toggle",
     "completedAt": "Completed at",
     "taskTotal": "Total tasks",
+    "concurrency": "Concurrency",
+    "concurrencyEditHint": "Click to edit. Cannot change while the queue is running.",
     "taskList": "Task list",
     "startLabel": "Start",
     "completeLabel": "Complete",

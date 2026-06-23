@@ -990,6 +990,7 @@ async function createBatchQueue() {
     const roleSelect = document.getElementById('batch-queue-role');
     const projectSelect = document.getElementById('batch-queue-project-id');
     const agentModeSelect = document.getElementById('batch-queue-agent-mode');
+    const concurrencyInput = document.getElementById('batch-queue-concurrency');
     const scheduleModeSelect = document.getElementById('batch-queue-schedule-mode');
     const cronExprInput = document.getElementById('batch-queue-cron-expr');
     const executeNowCheckbox = document.getElementById('batch-queue-execute-now');
@@ -1019,6 +1020,9 @@ async function createBatchQueue() {
     const scheduleMode = scheduleModeSelect ? (scheduleModeSelect.value === 'cron' ? 'cron' : 'manual') : 'manual';
     const cronExpr = cronExprInput ? cronExprInput.value.trim() : '';
     const executeNow = executeNowCheckbox ? !!executeNowCheckbox.checked : false;
+    let concurrency = concurrencyInput ? parseInt(concurrencyInput.value, 10) : 1;
+    if (!Number.isFinite(concurrency) || concurrency < 1) concurrency = 1;
+    if (concurrency > 8) concurrency = 8;
     if (scheduleMode === 'cron' && !cronExpr) {
         alert(_t('batchImportModal.cronExprRequired'));
         return;
@@ -1043,6 +1047,7 @@ async function createBatchQueue() {
                 cronExpr,
                 executeNow,
                 projectId,
+                concurrency,
             }),
         });
         
@@ -1489,6 +1494,7 @@ async function showBatchQueueDetail(queueId) {
                 <div class="bq-kv"><span class="bq-kv__k">${escapeHtml(_t('batchQueueDetailModal.role'))}</span><span class="bq-kv__v" id="bq-role-val">${allowSubtaskMutation ? `<span class="bq-inline-editable" onclick="startInlineEditRole()" title="${escapeHtml(_t('common.edit'))}">${roleLineVal}</span>` : roleLineVal}</span></div>
                 <div class="bq-kv"><span class="bq-kv__k">${escapeHtml(_t('batchImportModal.agentMode'))}</span><span class="bq-kv__v" id="bq-agentmode-val">${allowSubtaskMutation ? `<span class="bq-inline-editable" onclick="startInlineEditAgentMode()" title="${escapeHtml(_t('common.edit'))}">${escapeHtml(agentModeText)}</span>` : escapeHtml(agentModeText)}</span></div>
                 <div class="bq-kv"><span class="bq-kv__k">${escapeHtml(_t('batchImportModal.scheduleMode'))}</span><span class="bq-kv__v" id="bq-schedule-val">${allowSubtaskMutation ? `<span class="bq-inline-editable" onclick="startInlineEditSchedule()" title="${escapeHtml(_t('common.edit'))}">${scheduleDetail}</span>` : scheduleDetail}</span></div>
+                <div class="bq-kv"><span class="bq-kv__k">${escapeHtml(_t('batchQueueDetailModal.concurrency'))}</span><span class="bq-kv__v" id="bq-concurrency-val">${allowSubtaskMutation ? `<span class="bq-inline-editable" onclick="startInlineEditConcurrency()" title="${escapeHtml(_t('common.edit'))}">${escapeHtml(String(queue.concurrency && queue.concurrency > 0 ? queue.concurrency : 1))}</span>` : escapeHtml(String(queue.concurrency && queue.concurrency > 0 ? queue.concurrency : 1))}</span></div>
                 <div class="bq-kv"><span class="bq-kv__k">${escapeHtml(_t('batchQueueDetailModal.taskTotal'))}</span><span class="bq-kv__v">${queue.tasks.length}</span></div>
                 ${queue.scheduleMode === 'cron' ? `<div class="bq-kv bq-kv--block"><span class="bq-kv__k">${escapeHtml(_t('batchQueueDetailModal.scheduleCronAuto'))}</span><span class="bq-kv__v bq-kv__v--control"><label class="bq-cron-toggle"><input type="checkbox" ${queue.scheduleEnabled !== false ? 'checked' : ''} onchange="updateBatchQueueScheduleEnabled(this.checked)" /><span class="bq-cron-toggle__hint">${escapeHtml(_t('batchQueueDetailModal.scheduleCronAutoHint'))}</span></label></span></div>` : ''}
             </section>
@@ -2287,6 +2293,75 @@ async function saveInlineAgentMode() {
     }
 }
 
+function normalizeBatchQueueConcurrencyInput(raw) {
+    let n = parseInt(raw, 10);
+    if (!Number.isFinite(n) || n < 1) n = 1;
+    if (n > 8) n = 8;
+    return n;
+}
+
+// --- 内联编辑：并发数 ---
+function startInlineEditConcurrency() {
+    const container = document.getElementById('bq-concurrency-val');
+    if (!container) return;
+    const queueId = batchQueuesState.currentQueueId;
+    if (!queueId) return;
+    apiFetch(`/api/batch-tasks/${queueId}`).then(r => r.json()).then(detail => {
+        const queue = detail.queue || {};
+        const current = normalizeBatchQueueConcurrencyInput(queue.concurrency || 1);
+        container.innerHTML = `<span class="bq-inline-edit-controls">
+            <input type="number" id="bq-edit-concurrency" min="1" max="8" value="${current}" style="width:72px;" />
+        </span>`;
+        const inp = document.getElementById('bq-edit-concurrency');
+        if (!inp) return;
+        inp.focus();
+        inp.select();
+        let cancelled = false;
+        inp.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+            if (e.key === 'Escape') { cancelled = true; cancelAllInlineEdits(); }
+        });
+        inp.addEventListener('blur', () => {
+            if (!cancelled) saveInlineConcurrency();
+        });
+    });
+}
+
+async function saveInlineConcurrency() {
+    if (_bqInlineSaving) return;
+    _bqInlineSaving = true;
+    const queueId = batchQueuesState.currentQueueId;
+    if (!queueId) { _bqInlineSaving = false; return; }
+    const inp = document.getElementById('bq-edit-concurrency');
+    const concurrency = normalizeBatchQueueConcurrencyInput(inp ? inp.value : 1);
+    try {
+        const detailResp = await apiFetch(`/api/batch-tasks/${queueId}`);
+        const detail = await detailResp.json();
+        const q = detail.queue || {};
+        const response = await apiFetch(`/api/batch-tasks/${queueId}/metadata`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: q.title || '',
+                role: q.role || '',
+                agentMode: q.agentMode || 'eino_single',
+                concurrency,
+            }),
+        });
+        if (!response.ok) {
+            const result = await response.json().catch(() => ({}));
+            throw new Error(result.error || _t('tasks.updateTaskFailed'));
+        }
+        _bqInlineSaving = false;
+        showBatchQueueDetail(queueId);
+        refreshBatchQueues();
+    } catch (e) {
+        _bqInlineSaving = false;
+        console.error(e);
+        alert(e.message);
+    }
+}
+
 // --- 单条执行 ---
 async function runSingleBatchTask(queueId, taskId) {
     if (!queueId || !taskId) return;
@@ -2441,6 +2516,8 @@ window.startInlineEditRole = startInlineEditRole;
 window.saveInlineRole = saveInlineRole;
 window.startInlineEditAgentMode = startInlineEditAgentMode;
 window.saveInlineAgentMode = saveInlineAgentMode;
+window.startInlineEditConcurrency = startInlineEditConcurrency;
+window.saveInlineConcurrency = saveInlineConcurrency;
 window.runSingleBatchTask = runSingleBatchTask;
 window.startInlineEditSchedule = startInlineEditSchedule;
 window.toggleInlineScheduleCron = toggleInlineScheduleCron;
