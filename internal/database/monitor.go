@@ -410,6 +410,76 @@ func (db *DB) GetToolExecutionsByIds(ids []string) ([]*mcp.ToolExecution, error)
 	return executions, nil
 }
 
+type toolExecutionStatDelta struct {
+	totalCalls   int
+	successCalls int
+	failedCalls  int
+}
+
+// PurgeToolExecutionsBefore deletes executions older than cutoff and adjusts tool_stats.
+func (db *DB) PurgeToolExecutionsBefore(cutoff time.Time) (int64, error) {
+	query := `
+		SELECT tool_name, status, COUNT(*) AS cnt
+		FROM tool_executions
+		WHERE ` + sqliteEpochGE("start_time", "<") + `
+		GROUP BY tool_name, status
+	`
+	rows, err := db.Query(query, formatSQLiteUTC(cutoff))
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	deltas := make(map[string]*toolExecutionStatDelta)
+	for rows.Next() {
+		var toolName, status string
+		var count int
+		if err := rows.Scan(&toolName, &status, &count); err != nil {
+			db.logger.Warn("读取待清理执行记录统计失败", zap.Error(err))
+			continue
+		}
+		toolName = strings.TrimSpace(toolName)
+		if toolName == "" || count <= 0 {
+			continue
+		}
+		delta := deltas[toolName]
+		if delta == nil {
+			delta = &toolExecutionStatDelta{}
+			deltas[toolName] = delta
+		}
+		delta.totalCalls += count
+		switch status {
+		case "failed", "cancelled":
+			delta.failedCalls += count
+		case "completed":
+			delta.successCalls += count
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return 0, err
+	}
+
+	res, err := db.Exec(`DELETE FROM tool_executions WHERE `+sqliteEpochGE("start_time", "<"), formatSQLiteUTC(cutoff))
+	if err != nil {
+		return 0, err
+	}
+	deleted, err := res.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	for toolName, delta := range deltas {
+		if err := db.DecreaseToolStats(toolName, delta.totalCalls, delta.successCalls, delta.failedCalls); err != nil {
+			db.logger.Warn("清理过期执行记录后更新统计失败",
+				zap.Error(err),
+				zap.String("toolName", toolName),
+			)
+		}
+	}
+
+	return deleted, nil
+}
+
 // SaveToolStats 保存工具统计信息
 func (db *DB) SaveToolStats(toolName string, stats *mcp.ToolStats) error {
 	var lastCallTime sql.NullTime

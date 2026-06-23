@@ -27,6 +27,7 @@ type Config struct {
 	Database    DatabaseConfig        `yaml:"database"`
 	Auth        AuthConfig            `yaml:"auth"`
 	Audit       AuditConfig           `yaml:"audit,omitempty" json:"audit,omitempty"`
+	Monitor     MonitorConfig         `yaml:"monitor,omitempty" json:"monitor,omitempty"`
 	ExternalMCP ExternalMCPConfig     `yaml:"external_mcp,omitempty"`
 	Knowledge   KnowledgeConfig       `yaml:"knowledge,omitempty"`
 	C2          C2Config              `yaml:"c2,omitempty" json:"c2,omitempty"` // 内置 C2 总开关；未配置时默认启用
@@ -621,6 +622,23 @@ type AuthConfig struct {
 	GeneratedPassword           string `yaml:"-" json:"-"`
 	GeneratedPasswordPersisted  bool   `yaml:"-" json:"-"`
 	GeneratedPasswordPersistErr string `yaml:"-" json:"-"`
+}
+
+// MonitorConfig MCP 状态监控（tool_executions）保留策略。
+type MonitorConfig struct {
+	// RetentionDays 执行记录保留天数；省略时默认 90；0 表示不自动清理。
+	RetentionDays *int `yaml:"retention_days,omitempty" json:"retention_days,omitempty"`
+}
+
+// RetentionDaysEffective returns retention; 0 means keep forever; omitted defaults to 90.
+func (m MonitorConfig) RetentionDaysEffective() int {
+	if m.RetentionDays == nil {
+		return 90
+	}
+	if *m.RetentionDays < 0 {
+		return 0
+	}
+	return *m.RetentionDays
 }
 
 // AuditConfig platform operation audit log settings (not chat/tool execution bodies).
@@ -1273,6 +1291,10 @@ func Default() *Config {
 				MaxDetailBytes: 8192,
 				Enabled:        &on,
 			}
+		}(),
+		Monitor: func() MonitorConfig {
+			days := 90
+			return MonitorConfig{RetentionDays: &days}
 		}(),
 		Robots: RobotsConfig{
 			Session: RobotSessionConfig{
