@@ -1360,6 +1360,7 @@ func (h *AgentHandler) cancelToolContinueAfter(conversationID, preferredExecID, 
 func (h *AgentHandler) CancelAgentLoop(c *gin.Context) {
 	var req struct {
 		ConversationID string `json:"conversationId" binding:"required"`
+		ExecutionID    string `json:"executionId,omitempty"`
 		Reason         string `json:"reason,omitempty"`
 		ContinueAfter  bool   `json:"continueAfter,omitempty"`
 	}
@@ -1376,7 +1377,7 @@ func (h *AgentHandler) CancelAgentLoop(c *gin.Context) {
 		}
 		note := strings.TrimSpace(req.Reason)
 		activeExec := strings.TrimSpace(h.tasks.ActiveMCPExecutionID(req.ConversationID))
-		if ok, payload := h.cancelToolContinueAfter(req.ConversationID, "", note); ok {
+		if ok, payload := h.cancelToolContinueAfter(req.ConversationID, strings.TrimSpace(req.ExecutionID), note); ok {
 			execID, _ := payload["executionId"].(string)
 			h.logger.Info("对话页仅终止当前工具",
 				zap.String("conversationId", req.ConversationID),

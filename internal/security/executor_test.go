@@ -2,6 +2,8 @@ package security
 
 import (
 	"context"
+	"os/exec"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -146,4 +148,34 @@ func indexOf(slice []string, s string) int {
 		}
 	}
 	return -1
+}
+
+// TestCombinedOutputCancellable_ContextCancelKillsTree 验证 ctx 取消时能在数秒内结束（杀进程组，非挂死）。
+func TestCombinedOutputCancellable_ContextCancelKillsTree(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("unix process group kill")
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "sh", "-c", "sleep 300")
+	ConfigureShellCmdForAgentExecute(cmd)
+
+	done := make(chan error, 1)
+	go func() {
+		_, err := combinedOutputCancellable(ctx, cmd)
+		done <- err
+	}()
+
+	time.Sleep(150 * time.Millisecond)
+	cancel()
+
+	select {
+	case err := <-done:
+		if err == nil {
+			t.Fatal("expected context cancel error")
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("combinedOutputCancellable did not return within 5s after context cancel")
+	}
 }

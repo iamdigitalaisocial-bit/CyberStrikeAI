@@ -162,9 +162,8 @@ func (e *Executor) ExecuteTool(ctx context.Context, toolName string, args map[st
 			output, err = runCommandWithPTY(ctx, cmd2, cb)
 		}
 	} else {
-		outputBytes, err2 := cmd.CombinedOutput()
-		output = string(outputBytes)
-		err = err2
+		// 非流式：内存缓冲 + ctx 取消杀进程组；行为对齐原 CombinedOutput，避免双流管道 fan-in 死锁。
+		output, err = combinedOutputCancellable(ctx, cmd)
 		if err != nil && shouldRetryWithPTY(output) {
 			e.logger.Info("检测到工具需要 TTY，使用 PTY 重试",
 				zap.String("tool", toolName),
@@ -981,9 +980,7 @@ func (e *Executor) executeSystemCommand(ctx context.Context, args map[string]int
 			output, err = runCommandWithPTY(ctx, cmd2, cb)
 		}
 	} else {
-		outputBytes, err2 := cmd.CombinedOutput()
-		output = string(outputBytes)
-		err = err2
+		output, err = combinedOutputCancellable(ctx, cmd)
 		if err != nil && shouldRetryWithPTY(output) {
 			e.logger.Info("检测到系统命令需要 TTY，使用 PTY 重试")
 			cmd2 := exec.CommandContext(ctx, shell, "-c", command)
@@ -1025,6 +1022,57 @@ func (e *Executor) executeSystemCommand(ctx context.Context, args map[string]int
 		},
 		IsError: false,
 	}, nil
+}
+
+// combinedOutputCancellable 行为对齐 cmd.CombinedOutput（stdout/stderr 写入内存缓冲），
+// 但在 ctx 取消时 terminateCmdTree 终止整棵进程树。
+// 非流式路径不使用双流管道 fan-in，避免 stderr 撑满管道缓冲区时与 stdout 互相阻塞导致死锁。
+// 无输出空闲检测由上层 agent.tool_timeout_minutes 兜底，不改变原 CombinedOutput 语义。
+func combinedOutputCancellable(ctx context.Context, cmd *exec.Cmd) (string, error) {
+	if err := prepareShellCmdSession(cmd); err != nil {
+		return "", err
+	}
+	var stdoutBuf, stderrBuf strings.Builder
+	cmd.Stdout = &stdoutBuf
+	cmd.Stderr = &stderrBuf
+
+	if err := cmd.Start(); err != nil {
+		return "", err
+	}
+
+	done := make(chan error, 1)
+	go func() {
+		done <- cmd.Wait()
+	}()
+
+	stopWatch := make(chan struct{})
+	go func() {
+		select {
+		case <-ctx.Done():
+			terminateCmdTree(cmd)
+		case <-stopWatch:
+		}
+	}()
+	defer close(stopWatch)
+
+	var waitErr error
+	select {
+	case waitErr = <-done:
+	case <-ctx.Done():
+		waitErr = <-done
+		return joinCommandOutput(stdoutBuf.String(), stderrBuf.String()), ctx.Err()
+	}
+	return joinCommandOutput(stdoutBuf.String(), stderrBuf.String()), waitErr
+}
+
+func joinCommandOutput(stdout, stderr string) string {
+	if stderr == "" {
+		return stdout
+	}
+	if stdout == "" {
+		return stderr
+	}
+	return stdout + stderr
 }
 
 // streamCommandOutput 以“边读边回调”的方式读取命令 stdout/stderr。
@@ -1091,7 +1139,9 @@ func streamCommandOutput(ctx context.Context, cmd *exec.Cmd, cb ToolOutputCallba
 		if deltaBuilder.Len() == 0 {
 			return
 		}
-		cb(deltaBuilder.String())
+		if cb != nil {
+			cb(deltaBuilder.String())
+		}
 		deltaBuilder.Reset()
 		lastFlush = time.Now()
 	}
@@ -1118,6 +1168,11 @@ chunksLoop:
 			idleCh = idleWatch.Expired
 		}
 		select {
+		case <-ctx.Done():
+			terminateCmdTree(cmd)
+			flush()
+			_ = cmd.Wait()
+			return outBuilder.String(), ctx.Err()
 		case <-idleCh:
 			fireInactivity()
 			return outBuilder.String(), fmt.Errorf("shell inactivity timeout (%ds)", idleWatch.Sec)
