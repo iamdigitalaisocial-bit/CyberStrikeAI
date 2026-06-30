@@ -139,9 +139,16 @@ function normalizeHitlMode(mode) {
 function defaultHitlConfig() {
     return {
         mode: HITL_MODE_OFF,
+        reviewer: 'human',
         sensitiveTools: '',
         updatedAt: ''
     };
+}
+
+function normalizeHitlReviewer(v) {
+    const x = String(v || '').trim().toLowerCase();
+    if (x === 'audit_agent' || x === 'agent' || x === 'ai') return 'audit_agent';
+    return 'human';
 }
 
 /** 白名单字符串拆成数组（逗号或换行分隔，与 textarea 一致） */
@@ -218,6 +225,7 @@ function getHitlLastGlobalConfig() {
         if (!parsed || typeof parsed !== 'object') return null;
         return {
             mode: normalizeHitlMode(parsed.mode),
+            reviewer: normalizeHitlReviewer(parsed.reviewer),
             sensitiveTools: typeof parsed.sensitiveTools === 'string' ? parsed.sensitiveTools : fallback.sensitiveTools,
             updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : ''
         };
@@ -248,6 +256,7 @@ function getHitlConfigForConversation(conversationId) {
                 if (parsed && typeof parsed === 'object') {
                     draftCfg = {
                         mode: normalizeHitlMode(parsed.mode),
+                        reviewer: normalizeHitlReviewer(parsed.reviewer),
                         sensitiveTools: typeof parsed.sensitiveTools === 'string' ? parsed.sensitiveTools : fallback.sensitiveTools,
                         updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : ''
                     };
@@ -258,6 +267,7 @@ function getHitlConfigForConversation(conversationId) {
         }
         const g = globalLast ? {
             mode: normalizeHitlMode(globalLast.mode),
+            reviewer: normalizeHitlReviewer(globalLast.reviewer),
             sensitiveTools: typeof globalLast.sensitiveTools === 'string' ? globalLast.sensitiveTools : fallback.sensitiveTools,
             updatedAt: typeof globalLast.updatedAt === 'string' ? globalLast.updatedAt : ''
         } : null;
@@ -280,6 +290,7 @@ function getHitlConfigForConversation(conversationId) {
         }
         return {
             mode: normalizeHitlMode(parsed.mode),
+            reviewer: normalizeHitlReviewer(parsed.reviewer),
             sensitiveTools: typeof parsed.sensitiveTools === 'string' ? parsed.sensitiveTools : fallback.sensitiveTools,
             updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : ''
         };
@@ -288,10 +299,52 @@ function getHitlConfigForConversation(conversationId) {
     }
 }
 
+function setHitlReviewerUI(reviewer) {
+    const v = normalizeHitlReviewer(reviewer);
+    const hidden = document.getElementById('hitl-reviewer-select');
+    if (hidden) hidden.value = v;
+    document.querySelectorAll('.hitl-reviewer-toggle-btn').forEach(function (btn) {
+        const active = btn.getAttribute('data-reviewer') === v;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+}
+
+async function onHitlReviewerChanged(reviewer) {
+    setHitlReviewerUI(reviewer);
+    const cfg = readHitlConfigFromForm();
+    const cid = typeof currentConversationId === 'string' ? currentConversationId.trim() : '';
+    saveHitlConfigForConversation(cid, cfg, { syncGlobalLast: true });
+    if (cid && typeof window.saveHitlConversationConfig === 'function') {
+        try {
+            await window.saveHitlConversationConfig(cid, cfg);
+            const ok = typeof window.t === 'function' ? window.t('hitl.pageReviewerSaved') : '审批方已保存。';
+            showChatToast(ok, 'success');
+        } catch (e) {
+            console.warn('onHitlReviewerChanged', e);
+            const prefix = typeof window.t === 'function' ? window.t('chat.hitlApplyFail') : '同步到服务器失败';
+            showChatToast(prefix, 'error');
+        }
+    }
+}
+
+function bindHitlReviewerToggleListeners() {
+    document.querySelectorAll('.hitl-reviewer-toggle-btn').forEach(function (btn) {
+        if (btn.dataset.hitlReviewerBound === '1') return;
+        btn.dataset.hitlReviewerBound = '1';
+        btn.addEventListener('click', function () {
+            const v = btn.getAttribute('data-reviewer');
+            if (!v) return;
+            onHitlReviewerChanged(v);
+        });
+    });
+}
+
 function saveHitlConfigForConversation(conversationId, cfg, opts) {
     const syncGlobalLast = !!(opts && opts.syncGlobalLast);
     const payload = {
         mode: normalizeHitlMode(cfg && cfg.mode),
+        reviewer: normalizeHitlReviewer(cfg && cfg.reviewer),
         sensitiveTools: typeof (cfg && cfg.sensitiveTools) === 'string' ? cfg.sensitiveTools : '',
         updatedAt: typeof (cfg && cfg.updatedAt) === 'string' ? cfg.updatedAt : ''
     };
@@ -308,8 +361,10 @@ function saveHitlConfigForConversation(conversationId, cfg, opts) {
 
 function readHitlConfigFromForm() {
     const modeEl = document.getElementById('hitl-mode-select');
+    const reviewerEl = document.getElementById('hitl-reviewer-select');
     const toolsEl = document.getElementById('hitl-sensitive-tools');
     const mode = normalizeHitlMode(modeEl ? modeEl.value : HITL_MODE_OFF);
+    const reviewer = normalizeHitlReviewer(reviewerEl ? reviewerEl.value : 'human');
     let sensitiveTools = toolsEl ? String(toolsEl.value || '').trim() : '';
     const g = typeof window !== 'undefined' ? window.csaiHitlGlobalToolWhitelist : null;
     if (Array.isArray(g) && g.length > 0) {
@@ -317,6 +372,7 @@ function readHitlConfigFromForm() {
     }
     return {
         mode,
+        reviewer,
         sensitiveTools,
         updatedAt: new Date().toISOString()
     };
@@ -330,7 +386,9 @@ function applyHitlConfigToUI(cfg) {
     const conf = cfg || defaultHitlConfig();
     const modeEl = document.getElementById('hitl-mode-select');
     const toolsEl = document.getElementById('hitl-sensitive-tools');
-    if (modeEl) modeEl.value = normalizeHitlMode(conf.mode);
+    const uiMode = normalizeHitlMode(conf.mode);
+    if (modeEl) modeEl.value = uiMode;
+    setHitlReviewerUI(conf.reviewer);
     let toolsVal = conf.sensitiveTools || '';
     const g = typeof window !== 'undefined' ? window.csaiHitlGlobalToolWhitelist : null;
     if (Array.isArray(g) && g.length > 0) {
@@ -339,6 +397,15 @@ function applyHitlConfigToUI(cfg) {
     }
     if (toolsEl) toolsEl.value = toolsVal;
     updateHitlStatusUI(conf);
+}
+
+function bindHitlSidebarModeListener() {
+    const modeEl = document.getElementById('hitl-mode-select');
+    if (!modeEl || modeEl.dataset.hitlModeBound === '1') return;
+    modeEl.dataset.hitlModeBound = '1';
+    modeEl.addEventListener('change', function () {
+        applyHitlConfigToUI(readHitlConfigFromForm());
+    });
 }
 
 function refreshHitlConfigByCurrentConversation() {
@@ -413,6 +480,9 @@ async function applyHitlSidebarConfig() {
             const localOnly = typeof window.t === 'function' ? window.t('chat.hitlApplyOkLocal') : '已保存到本浏览器。';
             showHitlApplyFeedback(localOnly, false);
         }
+        if (typeof window.refreshHitlPageWhitelist === 'function') {
+            window.refreshHitlPageWhitelist();
+        }
     } catch (e) {
         console.warn('applyHitlSidebarConfig', e);
         const prefix = typeof window.t === 'function' ? window.t('chat.hitlApplyFail') : '同步到服务器失败';
@@ -449,6 +519,12 @@ if (typeof window !== 'undefined') {
     window.readHitlConfigFromForm = readHitlConfigFromForm;
     window.applyHitlConfigToUI = applyHitlConfigToUI;
     window.saveHitlConfigForConversation = saveHitlConfigForConversation;
+    window.getHitlConfigForConversation = getHitlConfigForConversation;
+    bindHitlSidebarModeListener();
+    bindHitlReviewerToggleListeners();
+    window.setHitlReviewerUI = setHitlReviewerUI;
+    window.onHitlReviewerChanged = onHitlReviewerChanged;
+    window.bindHitlReviewerToggleListeners = bindHitlReviewerToggleListeners;
     window.getHitlLastGlobalConfig = getHitlLastGlobalConfig;
     window.hitlMergeToolsForDisplay = hitlMergeToolsForDisplay;
     window.hitlStripGlobalToolsFromFormString = hitlStripGlobalToolsFromFormString;
@@ -743,6 +819,9 @@ async function initChatAgentModeFromConfig() {
                 window.csaiHitlGlobalToolWhitelist = tw.slice();
             }
         }
+        if (typeof window.refreshHitlPageWhitelist === 'function') {
+            window.refreshHitlPageWhitelist();
+        }
         document.querySelectorAll('.agent-mode-option').forEach(function (el) {
             const v = el.getAttribute('data-value');
             if (v === 'deep' || v === 'plan_execute' || v === 'supervisor') {
@@ -959,6 +1038,7 @@ async function sendMessage() {
         body.hitl = {
             enabled: true,
             mode: normalizeHitlMode(hitlCfg.mode),
+            reviewer: normalizeHitlReviewer(hitlCfg.reviewer),
             sensitiveTools: sensitiveTools
         };
     }

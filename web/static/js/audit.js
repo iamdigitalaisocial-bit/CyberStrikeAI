@@ -22,7 +22,7 @@ const AUDIT_ACTIONS_BY_CATEGORY = {
     task: ['create_queue', 'start_queue', 'delete_queue', 'pause_queue', 'rerun_queue', 'delete_batch_task'],
     tool: ['execution_delete', 'execution_delete_batch'],
     file: ['upload', 'delete'],
-    hitl: ['decision'],
+    hitl: ['decision', 'audit_strategy_update'],
     role: ['create', 'update', 'delete'],
     skill: ['create', 'update', 'delete'],
     agent: ['markdown_create', 'markdown_update', 'markdown_delete']

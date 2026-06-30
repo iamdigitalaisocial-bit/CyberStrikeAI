@@ -335,7 +335,9 @@ async function initPage(pageId) {
             }
             break;
         case 'hitl':
-            if (typeof refreshHitlPending === 'function') {
+            if (typeof refreshHitlActivePanel === 'function') {
+                refreshHitlActivePanel();
+            } else if (typeof refreshHitlPending === 'function') {
                 refreshHitlPending();
             }
             break;
