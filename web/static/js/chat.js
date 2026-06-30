@@ -6078,6 +6078,7 @@ let groupsCache = [];
 let conversationGroupMappingCache = {};
 let pendingGroupMappings = {}; // 待保留的分组映射（用于处理后端API延迟的情况）
 let conversationsListLoadSeq = 0; // 对话列表加载序号，避免并发请求导致重复渲染
+let conversationsListNavigateGen = 0; // 用户主动翻页代数，防止后台刷新覆盖翻页结果
 const CONVERSATIONS_PAGE_SIZE_KEY = 'cyberstrike.conversations_page_size';
 const CONVERSATIONS_SORT_KEY = 'cyberstrike.conversations_sort_by';
 const CONVERSATIONS_PROJECT_FILTER_KEY = 'cyberstrike.conversations_project_filter';
@@ -6451,6 +6452,45 @@ function getConversationsTotalPages() {
     return Math.max(1, Math.ceil((total || 0) / pageSize) || 1);
 }
 
+function isStaleConversationListLoad(loadSeq, intentPage, navigateGenAtStart) {
+    if (loadSeq !== conversationsListLoadSeq) return true;
+    // 后台刷新期间用户已翻页（含 2→1、1→2），丢弃过期结果
+    if (intentPage == null && navigateGenAtStart !== conversationsListNavigateGen) return true;
+    return false;
+}
+
+function commitConversationsListPage(activePage, intentPage) {
+    if (intentPage != null) {
+        conversationsPagination.page = activePage;
+        return;
+    }
+    // 勿用加载开始时的旧页码覆盖用户中途翻页
+    if (conversationsPagination.page !== activePage) return;
+}
+
+function reconcileConversationsPageAfterTotal(activePage, intentPage, parsed, pageSize, offset, resolvedTotal) {
+    let total = resolvedTotal;
+    const totalPages = () => Math.max(1, Math.ceil((total || 0) / pageSize) || 1);
+
+    if (activePage <= totalPages()) {
+        return { ok: true, total };
+    }
+
+    const serverTotal = parseListTotalValue(parsed.total, parsed.items.length);
+    const hasPageData = parsed.items.length > 0;
+    // 用户主动翻页且服务端确有该页数据时，不信过期/偏低的 total（避免 2>1 被钳回第 1 页）
+    if (intentPage != null && (hasPageData || serverTotal > offset || total > offset)) {
+        total = Math.max(total, serverTotal, offset + parsed.items.length);
+        if (activePage <= totalPages()) {
+            return { ok: true, total };
+        }
+    }
+
+    const clampedPage = totalPages();
+    conversationsPagination.page = clampedPage;
+    return { ok: false, total, clampedPage };
+}
+
 function clampConversationsPageToTotal() {
     const totalPages = getConversationsTotalPages();
     if (conversationsPagination.page > totalPages) {
@@ -6623,6 +6663,7 @@ function renderConversationsPagination(visibleCount) {
 function goConversationsPage(page) {
     const requestedPage = Math.max(1, parseInt(page, 10) || 1);
     const scrollToTop = requestedPage !== conversationsPagination.page;
+    conversationsListNavigateGen += 1;
     conversationsPagination.page = requestedPage;
     // intentPage：用户主动翻页，不在此处用可能已被并发刷新污染的 total 做钳制
     loadConversationsWithGroups(conversationsSearchQuery, {
@@ -6743,6 +6784,7 @@ async function loadConversationsWithGroups(searchQuery = '', options = {}) {
     const refreshMeta = options.refreshMeta !== false;
     const scrollToTop = options.scrollToTop === true;
     const intentPage = Number.isFinite(options.intentPage) ? options.intentPage : null;
+    const navigateGenAtStart = conversationsListNavigateGen;
     const loadSeq = ++conversationsListLoadSeq;
     try {
         conversationsSearchQuery = searchQuery || '';
@@ -6774,7 +6816,7 @@ async function loadConversationsWithGroups(searchQuery = '', options = {}) {
         }
         const results = await Promise.all(fetchTasks);
         const response = results[results.length - 1];
-        if (loadSeq !== conversationsListLoadSeq) return;
+        if (isStaleConversationListLoad(loadSeq, intentPage, navigateGenAtStart)) return;
 
         const listContainer = document.getElementById('conversations-list');
         if (!listContainer) {
@@ -6797,26 +6839,28 @@ async function loadConversationsWithGroups(searchQuery = '', options = {}) {
         }
 
         const data = await response.json();
-        if (loadSeq !== conversationsListLoadSeq) return;
+        if (isStaleConversationListLoad(loadSeq, intentPage, navigateGenAtStart)) return;
         const parsed = parseConversationsListResponse(data);
         const resolvedTotal = await resolveConversationsListTotal(convParams, parsed, pageSize, offset);
-        if (loadSeq !== conversationsListLoadSeq) return;
+        if (isStaleConversationListLoad(loadSeq, intentPage, navigateGenAtStart)) return;
         conversationsPagination.total = resolvedTotal;
 
-        const totalPages = getConversationsTotalPages();
-        if (activePage > totalPages) {
-            conversationsPagination.page = totalPages;
-            if (loadSeq !== conversationsListLoadSeq) return;
+        const pageCheck = reconcileConversationsPageAfterTotal(
+            activePage, intentPage, parsed, pageSize, offset, resolvedTotal
+        );
+        conversationsPagination.total = pageCheck.total;
+        if (!pageCheck.ok) {
+            if (isStaleConversationListLoad(loadSeq, intentPage, navigateGenAtStart)) return;
             loadConversationsWithGroups(searchQuery, {
                 ...options,
                 intentPage: null,
-                scrollToTop: options.scrollToTop === true || activePage !== totalPages,
+                scrollToTop: options.scrollToTop === true || activePage !== pageCheck.clampedPage,
             });
             return;
         }
-        conversationsPagination.page = activePage;
+        commitConversationsListPage(activePage, intentPage);
         if (intentPage == null && clampConversationsPageToTotal()) {
-            if (loadSeq !== conversationsListLoadSeq) return;
+            if (isStaleConversationListLoad(loadSeq, intentPage, navigateGenAtStart)) return;
             loadConversationsWithGroups(searchQuery, options);
             return;
         }
@@ -6963,7 +7007,7 @@ async function loadConversationsWithGroups(searchQuery = '', options = {}) {
             return;
         }
 
-        if (loadSeq !== conversationsListLoadSeq) return;
+        if (isStaleConversationListLoad(loadSeq, intentPage, navigateGenAtStart)) return;
         listContainer.appendChild(fragment);
         updateActiveConversation();
         renderConversationsPagination(visibleCount);
@@ -6971,13 +7015,13 @@ async function loadConversationsWithGroups(searchQuery = '', options = {}) {
         // 翻页时回到列表顶部；后台刷新保留滚动位置
         if (sidebarContent) {
             requestAnimationFrame(() => {
-                if (loadSeq === conversationsListLoadSeq) {
+                if (!isStaleConversationListLoad(loadSeq, intentPage, navigateGenAtStart)) {
                     sidebarContent.scrollTop = scrollToTop ? 0 : savedScrollTop;
                 }
             });
         }
     } catch (error) {
-        if (loadSeq !== conversationsListLoadSeq) return;
+        if (isStaleConversationListLoad(loadSeq, intentPage, navigateGenAtStart)) return;
         console.error('加载对话列表失败:', error);
         // 错误时显示空状态，而不是错误提示（更友好的用户体验）
         const listContainer = document.getElementById('conversations-list');
