@@ -6699,6 +6699,8 @@ function changeConversationsPageSize() {
     const sel = document.getElementById('conversations-page-size-pagination');
     const newSize = sel ? parseInt(sel.value, 10) : 50;
     if (![20, 50, 100].includes(newSize)) return;
+    // 重建 DOM 后浏览器可能异步触发 change，值未变时不应重置页码
+    if (newSize === conversationsPagination.pageSize) return;
     try {
         localStorage.setItem(CONVERSATIONS_PAGE_SIZE_KEY, String(newSize));
     } catch (e) { /* ignore */ }
