@@ -685,8 +685,6 @@ CyberStrikeAI has joined [404Starlink](https://github.com/knownsec/404StarLink)
   </a>
 </div>
 
-## Stargazers over time
-![Stargazers over time](https://starchart.cc/Ed1s0nZ/CyberStrikeAI.svg)
 
 
 ---
