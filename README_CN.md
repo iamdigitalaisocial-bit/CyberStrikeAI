@@ -297,11 +297,11 @@ go build -o cyberstrike-ai cmd/server/main.go
 2. 重启服务或重新加载配置，角色会出现在角色选择下拉菜单中。
 
 ### 多代理模式（Eino：Deep / Plan-Execute / Supervisor）
-- **能力说明**：在 **Eino 单代理**（`/api/eino-agent*`）之外，多代理基于 CloudWeGo **Eino** `adk/prebuilt`：**`deep`**、**`plan_execute`**、**`supervisor`**；客户端 **`orchestration`** 选择（缺省 `deep`）。
+- **能力说明**：在 **Eino 单代理**（`/api/eino-agent*`）之外，多代理基于 CloudWeGo **Eino** `adk/prebuilt`：**`deep`**、**`plan_execute`**、**`supervisor`**；客户端 **`orchestration`** 选择（缺省 `deep`）。模式定位按 Eino ADK 最佳实践区分：**Deep** 适合复杂安全测试与 task 子代理协作；**Plan-Execute** 适合目标明确的规划 → 执行 → 重规划闭环；**Supervisor** 适合多个专业子代理动态分派的专家路由场景。
 - **Markdown 定义**（`agents_dir`，默认 `agents/`）：
   - **Deep 主代理**：`orchestrator.md` 或唯一 `kind: orchestrator` 的 `.md`；正文或 `multi_agent.orchestrator_instruction`，再回退 Eino 默认。
   - **Plan-Execute 主代理**：固定 **`orchestrator-plan-execute.md`**（另可配 `orchestrator_instruction_plan_execute`）。
-  - **Supervisor 主代理**：固定 **`orchestrator-supervisor.md`**（另可配 `orchestrator_instruction_supervisor`）；至少需一名子代理。
+  - **Supervisor 主代理**：固定 **`orchestrator-supervisor.md`**（另可配 `orchestrator_instruction_supervisor`）；至少需一名子代理，只有一名子代理时会提示专家路由价值有限。
   - **子代理**（**deep** / **supervisor**）：其余 `*.md`；标成 orchestrator 的不会进入 `task` 列表。
 - **界面管理**：**Agents → Agent 管理**；API `/api/multi-agent/markdown-agents`。
 - **配置项**：`multi_agent`：`enabled`、`robot_default_agent_mode`、`batch_use_multi_agent`、`max_iteration`、`plan_execute_loop_max_iterations`、各模式 orchestrator 指令字段、可选 YAML `sub_agents` 与目录合并（同 `id` → Markdown 优先）、**`eino_skills`**、**`eino_middleware`**。

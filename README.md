@@ -299,11 +299,11 @@ Requirements / tips:
 2. Restart the server or reload configuration; the role appears in the role selector dropdown.
 
 ### Multi-Agent Mode (Eino: Deep, Plan-Execute, Supervisor)
-- **What it is** – Multi-agent orchestration on CloudWeGo **Eino** `adk/prebuilt` (alongside **Eino single-agent** on `/api/eino-agent*`): **`deep`** — coordinator + **`task`** sub-agents; **`plan_execute`** — planner / executor / replanner; **`supervisor`** — orchestrator with **`transfer`** / **`exit`**. Client sends **`orchestration`**: `deep` | `plan_execute` | `supervisor` (default `deep`).
+- **What it is** – Multi-agent orchestration on CloudWeGo **Eino** `adk/prebuilt` (alongside **Eino single-agent** on `/api/eino-agent*`): **`deep`** — coordinator + **`task`** sub-agents for complex security testing and delegated synthesis; **`plan_execute`** — planner / executor / replanner for structured loops; **`supervisor`** — expert-routing mode with **`transfer`** / **`exit`** for multiple specialist sub-agents. Client sends **`orchestration`**: `deep` | `plan_execute` | `supervisor` (default `deep`).
 - **Markdown agents** – Under `agents_dir` (default `agents/`):
   - **Deep orchestrator**: `orchestrator.md` *or* one `.md` with `kind: orchestrator`. Body or `multi_agent.orchestrator_instruction`, then Eino defaults.
   - **Plan-Execute orchestrator**: fixed name **`orchestrator-plan-execute.md`** (plus optional `orchestrator_instruction_plan_execute` in YAML).
-  - **Supervisor orchestrator**: fixed name **`orchestrator-supervisor.md`** (plus optional `orchestrator_instruction_supervisor`); requires at least one sub-agent.
+  - **Supervisor orchestrator**: fixed name **`orchestrator-supervisor.md`** (plus optional `orchestrator_instruction_supervisor`); requires at least one sub-agent, and one-sub-agent runs emit a hint that expert routing has limited value.
   - **Sub-agents** (for **deep** / **supervisor**): other `*.md` files (YAML front matter + body). Not used as **`task`** targets if marked orchestrator-only.
 - **Management** – Web UI: **Agents → Agent management**; API `/api/multi-agent/markdown-agents`.
 - **Config** – `multi_agent` in `config.yaml`: `enabled`, `robot_default_agent_mode`, `batch_use_multi_agent`, `max_iteration`, `plan_execute_loop_max_iterations`, per-mode orchestrator instruction fields, optional YAML `sub_agents` merged with disk (`id` clash → Markdown wins), **`eino_skills`**, **`eino_middleware`** (optional ADK middleware and Deep/Supervisor tuning).
@@ -713,5 +713,3 @@ CyberStrikeAI is a professional security testing platform designed to assist sec
 ---
 
 Need help or want to contribute? Open an issue or PR—community tooling additions are welcome!
-
-

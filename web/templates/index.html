@@ -175,10 +175,10 @@
                     </div>
                     <div class="nav-item" data-page="hitl">
                         <div class="nav-item-content" data-title="人机协同" onclick="switchPage('hitl')">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="9" cy="7" r="4"></circle>
-                                <polyline points="16 11 18 13 22 9"></polyline>
+                                <path d="m16 11 2 2 4-4"></path>
                             </svg>
                             <span data-i18n="nav.hitl">人机协同</span>
                         </div>
@@ -1158,7 +1158,7 @@
                                                     <div class="role-selection-item-icon-main" aria-hidden="true">🧩</div>
                                                     <div class="role-selection-item-content-main">
                                                         <div class="role-selection-item-name-main" data-i18n="chat.agentModeDeep">Deep（DeepAgent）</div>
-                                                        <div class="role-selection-item-description-main" data-i18n="chat.agentModeDeepHint">Eino DeepAgent，task 调度子代理</div>
+                                                        <div class="role-selection-item-description-main" data-i18n="chat.agentModeDeepHint">Eino DeepAgent，适合复杂安全测试、多阶段 task 子代理委派与汇总</div>
                                                     </div>
                                                     <div class="role-selection-checkmark-main agent-mode-check" data-agent-mode-check="deep">✓</div>
                                                 </button>
@@ -1173,8 +1173,8 @@
                                                 <button type="button" class="role-selection-item-main agent-mode-option" data-value="supervisor" role="option" onclick="selectAgentMode('supervisor')">
                                                     <div class="role-selection-item-icon-main" aria-hidden="true">🎯</div>
                                                     <div class="role-selection-item-content-main">
-                                                        <div class="role-selection-item-name-main" data-i18n="chat.agentModeSupervisorLabel">Supervisor</div>
-                                                        <div class="role-selection-item-description-main" data-i18n="chat.agentModeSupervisorHint">监督者协调，transfer 委派子代理</div>
+                                                        <div class="role-selection-item-name-main" data-i18n="chat.agentModeSupervisorLabel">Supervisor（专家路由）</div>
+                                                        <div class="role-selection-item-description-main" data-i18n="chat.agentModeSupervisorHint">专家路由场景：监督者通过 transfer 动态分派多个专业子代理</div>
                                                     </div>
                                                     <div class="role-selection-checkmark-main agent-mode-check" data-agent-mode-check="supervisor">✓</div>
                                                 </button>
