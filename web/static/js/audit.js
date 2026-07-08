@@ -15,7 +15,7 @@ const AUDIT_ACTIONS_BY_CATEGORY = {
     c2: ['listener_create', 'listener_delete', 'listener_start', 'listener_stop',
         'session_delete', 'task_create', 'task_cancel', 'task_delete'],
     webshell: ['connection_create', 'connection_delete'],
-    knowledge: ['item_delete', 'index_rebuild'],
+    knowledge: ['item_delete', 'index_build', 'index_rebuild_full'],
     conversation: ['create', 'delete', 'delete_turn'],
     vulnerability: ['create', 'update', 'delete'],
     external_mcp: ['upsert', 'delete'],

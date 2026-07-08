@@ -1405,8 +1405,10 @@
     "totalItems": "Total items",
     "categories": "Categories",
     "addKnowledge": "Add knowledge",
-    "rebuildIndex": "Rebuild index",
-    "rebuildIndexConfirm": "Rebuild index?",
+    "buildIndex": "Build index",
+    "buildIndexConfirm": "Build vectors for knowledge items that are not indexed yet?",
+    "rebuildIndexFull": "Full rebuild",
+    "rebuildIndexFullConfirm": "Re-index all knowledge items? This may take a while.",
     "deleteItemConfirm": "Delete this knowledge item?",
     "notEnabledTitle": "Knowledge base function not enabled",
     "notEnabledHint": "Please go to system settings to enable knowledge retrieval.",
@@ -1653,7 +1655,7 @@
       "updateKnowledgeItem": "Update knowledge item",
       "deleteKnowledgeItem": "Delete knowledge item",
       "getIndexStatus": "Get index status",
-      "rebuildIndex": "Rebuild index",
+      "startKnowledgeIndex": "Build index",
       "scanKnowledgeBase": "Scan knowledge base",
       "searchKnowledgeBase": "Search knowledge base",
       "basicSearch": "Basic search",
@@ -2469,7 +2471,8 @@
       "connection_create": "Create connection",
       "connection_delete": "Delete connection",
       "item_delete": "Delete knowledge item",
-      "index_rebuild": "Rebuild index",
+      "index_build": "Build knowledge index",
+      "index_rebuild_full": "Full knowledge index rebuild",
       "delete": "Delete",
       "delete_turn": "Delete turn",
       "create": "Create",
@@ -2542,7 +2545,8 @@
       },
       "knowledge": {
         "item_delete": "Knowledge item deleted",
-        "index_rebuild": "Knowledge index rebuilt"
+        "index_build": "Knowledge index built",
+        "index_rebuild_full": "Knowledge index fully rebuilt"
       },
       "vulnerability": {
         "create": "Vulnerability record created",

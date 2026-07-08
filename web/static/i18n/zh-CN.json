@@ -1393,8 +1393,10 @@
     "totalItems": "总知识项",
     "categories": "分类数",
     "addKnowledge": "添加知识",
-    "rebuildIndex": "重建索引",
-    "rebuildIndexConfirm": "确定要重建索引吗？",
+    "buildIndex": "构建索引",
+    "buildIndexConfirm": "将为尚未生成向量的知识项构建索引，是否继续？",
+    "rebuildIndexFull": "全量重建",
+    "rebuildIndexFullConfirm": "将重新索引全部知识项，这可能需要较长时间，是否继续？",
     "deleteItemConfirm": "确定要删除这个知识项吗？",
     "notEnabledTitle": "知识库功能未启用",
     "notEnabledHint": "请前往系统设置启用知识检索功能",
@@ -1641,7 +1643,7 @@
       "updateKnowledgeItem": "更新知识项",
       "deleteKnowledgeItem": "删除知识项",
       "getIndexStatus": "获取索引状态",
-      "rebuildIndex": "重建索引",
+      "startKnowledgeIndex": "构建索引",
       "scanKnowledgeBase": "扫描知识库",
       "searchKnowledgeBase": "搜索知识库",
       "basicSearch": "基础搜索",
@@ -2457,7 +2459,8 @@
       "connection_create": "创建连接",
       "connection_delete": "删除连接",
       "item_delete": "删除知识项",
-      "index_rebuild": "重建索引",
+      "index_build": "构建知识库索引",
+      "index_rebuild_full": "全量重建知识库索引",
       "delete": "删除",
       "delete_turn": "删除轮次",
       "create": "创建",
@@ -2530,7 +2533,8 @@
       },
       "knowledge": {
         "item_delete": "删除知识项",
-        "index_rebuild": "重建知识库索引"
+        "index_build": "构建知识库索引",
+        "index_rebuild_full": "全量重建知识库索引"
       },
       "vulnerability": {
         "create": "创建漏洞记录",
