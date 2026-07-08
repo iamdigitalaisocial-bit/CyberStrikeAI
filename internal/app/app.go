@@ -1071,7 +1071,7 @@ func setupRoutes(
 					})
 					return
 				}
-				app.knowledgeHandler.RebuildIndex(c)
+				app.knowledgeHandler.StartIndex(c)
 			})
 			knowledgeRoutes.POST("/scan", func(c *gin.Context) {
 				if app.knowledgeHandler == nil {
