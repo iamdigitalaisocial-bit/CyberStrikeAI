@@ -139,9 +139,8 @@ func (h *AgentHandler) EinoSingleAgentLoopStream(c *gin.Context) {
 		"conversationId": conversationID,
 	})
 
-	stopKeepalive := make(chan struct{})
-	go sseKeepalive(c, stopKeepalive, &sseWriteMu)
-	defer close(stopKeepalive)
+	stopKeepalive := runSSEKeepalive(c, &sseWriteMu)
+	defer stopKeepalive()
 
 	if h.config == nil {
 		taskStatus = "failed"

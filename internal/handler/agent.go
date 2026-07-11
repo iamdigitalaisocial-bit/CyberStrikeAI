@@ -1611,9 +1611,8 @@ func (h *AgentHandler) SubscribeAgentTaskEvents(c *gin.Context) {
 	flusher, _ := c.Writer.(http.Flusher)
 	ctx := c.Request.Context()
 	var writeMu sync.Mutex
-	stopKeepalive := make(chan struct{})
-	go sseKeepalive(c, stopKeepalive, &writeMu)
-	defer close(stopKeepalive)
+	stopKeepalive := runSSEKeepalive(c, &writeMu)
+	defer stopKeepalive()
 
 	for {
 		select {
