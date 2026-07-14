@@ -15,6 +15,9 @@ version: "v1.7.2"
 server:
   host: 0.0.0.0 # 监听地址，0.0.0.0 表示监听所有网络接口
   port: 8080 # 服务端口；未启用 TLS 时为 http://localhost:8080
+  # 其他可信 Web 集成的精确 Origin。Chromium 浏览器插件会自动识别，无需配置；不要使用通配符。
+  # cors_allowed_origins:
+  #   - https://trusted-integration.example
   # --- 可选：HTTPS + HTTP/2（缓解浏览器对同源 HTTP/1.1 的并发连接数限制，多路 Deep 流式更稳）---
   # 启用 TLS 的条件（满足其一即可）：tls_enabled: true，或 tls_auto_self_sign: true，或同时配置了 tls_cert_path + tls_key_path。
   # 启用后请用 https://127.0.0.1:<本端口>/ 访问；若仍用 http:// 访问同端口，将自动 308 跳转到 HTTPS（可用 tls_http_redirect: false 关闭）。
