@@ -1319,7 +1319,7 @@ func setupRoutes(
 		protected.PUT("/roles/:name", roleHandler.UpdateRole)
 		protected.DELETE("/roles/:name", roleHandler.DeleteRole)
 
-		// 图编排 / 工作流定义（图结构固定，业务字段保存在 graph_json 中）
+		// 工作流定义（图结构固定，业务字段保存在 graph_json 中）
 		protected.GET("/workflows/runs/pending", workflowHandler.ListPendingRuns)
 		protected.GET("/workflows/runs/:runId/replay", workflowHandler.ReplayRun)
 		protected.GET("/workflows/runs/:runId", workflowHandler.GetRun)
