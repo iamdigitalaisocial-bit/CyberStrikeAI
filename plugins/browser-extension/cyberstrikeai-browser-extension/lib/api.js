@@ -14,8 +14,14 @@ async function apiFetch(baseUrl, path, options = {}) {
   try {
     res = await fetch(baseUrl + path, options);
   } catch (err) {
-    const e = err instanceof Error ? err : new Error(String(err));
+    if (err && err.name === 'AbortError') throw err;
+    const detail = err instanceof Error ? err.message : String(err);
+    const e = new Error(
+      `Cannot reach ${baseUrl}. Check network/CORS and trust the HTTPS certificate in this browser` +
+      (detail ? ` (${detail})` : '')
+    );
     e.network = true;
+    e.cause = err;
     throw e;
   }
   const text = await res.text();

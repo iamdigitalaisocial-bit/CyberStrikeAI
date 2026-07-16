@@ -1,6 +1,6 @@
 ## CyberStrikeAI 浏览器扩展
 
-**当前版本：0.3.8**（UI 为英文；中文说明见下文）
+**当前版本：0.3.10**（UI 为英文；中文说明见下文）
 
 Chrome / Edge（Chromium）DevTools 扩展：在开发者工具中捕获 **Network** 流量，发送到 CyberStrikeAI 进行 AI 辅助安全测试。能力与 Burp Suite 插件对齐，并按生产场景做了性能与体验优化。
 
@@ -88,6 +88,7 @@ Cookie: ...
 - **401/403** 时自动清空 Token 并展开连接栏
 - Send 前主动校验 Token 有效性
 - **optional_host_permissions**：Validate 时按需授权
+- 权限申请直接绑定 Validate 点击事件，仅申请当前 CyberStrikeAI 服务 origin；已授权地址不会重复弹窗
 
 ---
 
@@ -160,6 +161,12 @@ HTTP/2 伪首部。展示与 AI Prompt 已归一化为 HTTP/1.1；原始 HAR 仍
 
 **Validate 显示 `cross-origin request denied`？**  
 升级并重启 CyberStrikeAI 服务。新版服务会自动识别格式合法的 Chrome/Edge 扩展 Origin，无需复制插件 ID 或配置 CORS 白名单；插件首次 Validate 时仍会请求访问目标服务地址的浏览器权限。
+
+**Validate 要求允许访问 CyberStrikeAI 服务？**  
+在浏览器弹出的权限框中允许访问当前服务地址。插件只按需申请所填写的服务 origin，不需要开启全站访问。如果未出现权限框，请在 `chrome://extensions/` 重新加载扩展，完全关闭 DevTools 后再打开并点击 Validate。
+
+**HTTPS 显示无法连接，但 Burp 正常？**  
+Burp 插件会信任自签名证书，浏览器扩展不能绕过 Chromium 的 TLS 校验。请先在浏览器中打开服务地址并信任证书；生产环境建议使用包含服务 IP/域名 SAN 的受信任证书。
 
 **Test History 很多会挡住 Captured Requests 吗？**  
 不会。历史区最高占侧边栏 **42%**，超出部分区域内滚动；捕获区占剩余空间。

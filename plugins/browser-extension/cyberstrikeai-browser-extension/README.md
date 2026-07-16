@@ -1,6 +1,6 @@
 ## CyberStrikeAI Browser Extension
 
-**Version 0.3.8** — Full docs: **README.zh-CN.md**
+**Version 0.3.10** — Full docs: **README.zh-CN.md**
 
 Chromium DevTools extension: capture Network traffic and send it to CyberStrikeAI for AI-assisted security testing. Aligned with the Burp Suite plugin.
 
@@ -51,7 +51,7 @@ Closing DevTools clears panel data. Closing the browser invalidates the session 
 
 After reloading the extension, close DevTools completely and reopen (F12) if you see `chrome.runtime.connect` errors — the old panel context is invalidated.
 
-If Validate reports `cross-origin request denied`, upgrade and restart the CyberStrikeAI server. Current versions recognize valid Chrome/Edge extension origins automatically, so no extension ID or CORS configuration is required. The browser will still request host access on the first Validate.
+If Validate reports `cross-origin request denied`, upgrade and restart the CyberStrikeAI server. Current versions recognize valid Chrome/Edge extension origins automatically, so no extension ID or CORS configuration is required. The browser requests access only to the configured server origin on the first Validate, directly from the Validate click so Chromium can reliably show the optional-permission prompt.
 
 ### Package
 

@@ -175,20 +175,30 @@ function baseUrlFrom(cfg) {
   return `${scheme}://${cfg.host}:${cfg.port}`;
 }
 
-/** Request optional host permission for the configured CyberStrikeAI origin. */
-async function ensureHostPermission(baseUrl) {
+/**
+ * Request optional host permission for the configured CyberStrikeAI origin.
+ *
+ * Keep chrome.permissions.request() synchronous with the caller's click event.
+ * Awaiting permissions.contains() first can consume Chrome's transient user
+ * activation and make the request fail without showing a permission prompt.
+ */
+function ensureHostPermission(baseUrl) {
   if (!extensionContextAlive()) throw extensionContextError();
-  if (!chrome.permissions || !chrome.permissions.request) return;
+  if (!chrome.permissions || !chrome.permissions.request) return Promise.resolve();
   let origin;
   try {
     origin = new URL(baseUrl).origin + '/*';
   } catch (_) {
     throw new Error('Invalid Host/Port');
   }
-  const has = await chrome.permissions.contains({ origins: [origin] });
-  if (has) return;
-  const granted = await chrome.permissions.request({ origins: [origin] });
-  if (!granted) {
-    throw new Error('Permission required to access the CyberStrikeAI server');
-  }
+
+  // Do not add an await before this call. Chrome requires a user gesture for
+  // optional permission requests. Requesting an already granted origin is
+  // idempotent and resolves true without prompting again.
+  return chrome.permissions.request({ origins: [origin] }).then((granted) => {
+    if (granted) return;
+    const err = new Error(`Allow extension access to ${new URL(baseUrl).origin} to continue`);
+    err.code = 'HOST_PERMISSION_DENIED';
+    throw err;
+  });
 }

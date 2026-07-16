@@ -678,17 +678,21 @@ async function initConfig() {
 
 async function persistConnection() {
   try {
-    await saveConfig({
-      host: $('host').value.trim(),
-      port: $('port').value.trim(),
-      https: $('https').checked,
-      filterApiOnly: $('filter-api').checked,
-      renderMarkdown: $('render-md').checked,
-      showDebugEvents: $('debug-events').checked,
-    });
+    await saveConfig(connectionConfigFromForm());
   } catch (err) {
     onContextLoss(err);
   }
+}
+
+function connectionConfigFromForm() {
+  return {
+    host: $('host').value.trim(),
+    port: $('port').value.trim(),
+    https: $('https').checked,
+    filterApiOnly: $('filter-api').checked,
+    renderMarkdown: $('render-md').checked,
+    showDebugEvents: $('debug-events').checked,
+  };
 }
 
 async function onValidate() {
@@ -703,17 +707,23 @@ async function onValidate() {
   validateAbort = new AbortController();
   $('btn-validate').textContent = 'Cancel';
   setStatus('Validating...', 'pending');
-  await persistConnection();
-  try {
-    config = await loadConfig();
-  } catch (err) {
-    if (onContextLoss(err)) return;
-    throw err;
-  }
-  const baseUrl = baseUrlFrom(config);
+
+  const nextConfig = connectionConfigFromForm();
+  const baseUrl = baseUrlFrom(nextConfig);
   const password = $('password').value;
+  let hostPermission;
   try {
-    await ensureHostPermission(baseUrl);
+    // Invoke before the first await so Chrome still associates the optional
+    // permission prompt with the Validate button's user gesture.
+    hostPermission = ensureHostPermission(baseUrl);
+  } catch (err) {
+    hostPermission = Promise.reject(err);
+  }
+
+  try {
+    await hostPermission;
+    await saveConfig(nextConfig);
+    config = { ...config, ...nextConfig };
     const auth = await loginAndValidate(baseUrl, password, validateAbort.signal);
     token = auth.token;
     tokenExpiresAt = auth.expiresAt || '';
