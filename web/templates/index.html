@@ -178,43 +178,13 @@
                         <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
-                <nav class="main-sidebar-nav">
-                    <div class="nav-item" data-page="dashboard">
-                        <div class="nav-item-content" data-title="仪表盘" onclick="switchPage('dashboard')" data-i18n="nav.dashboard" data-i18n-attr="data-title" data-i18n-skip-text="true">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="3" width="7" height="9"></rect>
-                                <rect x="14" y="3" width="7" height="5"></rect>
-                                <rect x="14" y="12" width="7" height="9"></rect>
-                                <rect x="3" y="16" width="7" height="5"></rect>
-                            </svg>
-                            <span data-i18n="nav.dashboard">仪表盘</span>
-                        </div>
-                    </div>
+                <nav class="main-sidebar-nav" id="main-sidebar-nav">
                     <div class="nav-item" data-page="chat">
                         <div class="nav-item-content" data-title="对话" onclick="switchPage('chat')" data-i18n="nav.chat" data-i18n-attr="data-title" data-i18n-skip-text="true">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                             </svg>
                             <span data-i18n="nav.chat">对话</span>
-                        </div>
-                    </div>
-                    <div class="nav-item" data-page="hitl">
-                        <div class="nav-item-content" data-title="人机协同" onclick="switchPage('hitl')">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <path d="m16 11 2 2 4-4"></path>
-                            </svg>
-                            <span data-i18n="nav.hitl">人机协同</span>
-                        </div>
-                    </div>
-                    <div class="nav-item" data-page="info-collect">
-                        <div class="nav-item-content" data-title="信息收集" onclick="switchPage('info-collect')" data-i18n="nav.infoCollect" data-i18n-attr="data-title" data-i18n-skip-text="true">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
-                            <span data-i18n="nav.infoCollect">信息收集</span>
                         </div>
                     </div>
                     <div class="nav-item" data-page="tasks">
@@ -226,26 +196,6 @@
                             <span data-i18n="nav.tasks">任务管理</span>
                         </div>
                     </div>
-                    <div class="nav-item" data-page="workflows">
-                        <div class="nav-item-content" data-title="工作流" onclick="switchPage('workflows')" data-i18n="nav.workflows" data-i18n-attr="data-title" data-i18n-skip-text="true">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="3" width="8" height="8" rx="2"/>
-                                <path d="M7 11v4a2 2 0 0 0 2 2h4"/>
-                                <rect x="13" y="13" width="8" height="8" rx="2"/>
-                            </svg>
-                            <span data-i18n="nav.workflows">工作流</span>
-                        </div>
-                    </div>
-                    <div class="nav-item" data-page="projects">
-                        <div class="nav-item-content" data-title="项目管理" onclick="switchPage('projects')" data-i18n="nav.projects" data-i18n-attr="data-title" data-i18n-skip-text="true">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                                <polyline points="2 17 12 22 22 17"></polyline>
-                                <polyline points="2 12 12 17 22 12"></polyline>
-                            </svg>
-                            <span data-i18n="nav.projects">项目管理</span>
-                        </div>
-                    </div>
                     <div class="nav-item" data-page="vulnerabilities">
                         <div class="nav-item-content" data-title="漏洞管理" onclick="switchPage('vulnerabilities')" data-i18n="nav.vulnerabilities" data-i18n-attr="data-title" data-i18n-skip-text="true">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -255,15 +205,15 @@
                             <span data-i18n="nav.vulnerabilities">漏洞管理</span>
                         </div>
                     </div>
-                    <div class="nav-item" data-page="chat-files">
-                        <div class="nav-item-content" data-title="文件管理" onclick="switchPage('chat-files')" data-i18n="nav.chatFiles" data-i18n-attr="data-title" data-i18n-skip-text="true">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                            <span data-i18n="nav.chatFiles">文件管理</span>
-                        </div>
+                    <div class="nav-advanced-toggle" id="nav-advanced-toggle" onclick="document.getElementById('main-sidebar-nav').classList.toggle('nav-advanced-expanded'); this.classList.toggle('nav-advanced-toggle-open')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-advanced-caret">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                        <span>Advanced</span>
                     </div>
-                    <div class="nav-item" data-page="webshell">
+                    <div class="nav-category-group">
+                        <div class="nav-category-label nav-advanced">Offensive Tooling</div>
+                    <div class="nav-item nav-advanced" data-page="webshell">
                         <div class="nav-item-content" data-title="WebShell管理" onclick="switchPage('webshell')" data-i18n="nav.webshell" data-i18n-attr="data-title" data-i18n-skip-text="true">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="4 17 10 11 4 5"></polyline>
@@ -273,7 +223,7 @@
                         </div>
                     </div>
                     <!-- C2 侧栏入口（带子菜单） -->
-                    <div class="nav-item nav-item-has-submenu" data-page="c2" id="nav-c2">
+                    <div class="nav-item nav-item-has-submenu nav-advanced" data-page="c2" id="nav-c2">
                         <div class="nav-item-content" data-title="C2" onclick="window.toggleSubmenu('c2')" data-i18n="nav.c2" data-i18n-attr="data-title" data-i18n-skip-text="true">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"></path>
@@ -296,46 +246,47 @@
                             <div class="nav-submenu-item" data-page="c2-profiles" onclick="switchPage('c2-profiles')" data-i18n="nav.c2Profiles">流量伪装</div>
                         </div>
                     </div>
-                    <div class="nav-item nav-item-has-submenu" data-page="mcp">
-                        <div class="nav-item-content" data-title="MCP" onclick="window.toggleSubmenu('mcp')" data-i18n="nav.mcp" data-i18n-attr="data-title" data-i18n-skip-text="true">
+                    </div>
+                    <div class="nav-category-group">
+                        <div class="nav-category-label nav-advanced">Agent Configuration</div>
+                    <div class="nav-item nav-item-has-submenu nav-advanced" data-page="agents">
+                        <div class="nav-item-content" data-title="Agents" onclick="window.toggleSubmenu('agents')" data-i18n="nav.agents" data-i18n-attr="data-title" data-i18n-skip-text="true">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                <polyline points="2 17 12 22 22 17"></polyline>
+                                <polyline points="2 12 12 17 22 12"></polyline>
                             </svg>
-                            <span data-i18n="nav.mcp">MCP</span>
+                            <span data-i18n="nav.agents">Agents</span>
                             <svg class="submenu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </div>
                         <div class="nav-submenu">
-                            <div class="nav-submenu-item" data-page="mcp-monitor" onclick="switchPage('mcp-monitor')">
-                                <span data-i18n="nav.mcpMonitor">MCP状态监控</span>
-                            </div>
-                            <div class="nav-submenu-item" data-page="mcp-management" onclick="switchPage('mcp-management')">
-                                <span data-i18n="nav.mcpManagement">MCP管理</span>
+                            <div class="nav-submenu-item" data-page="agents-management" onclick="switchPage('agents-management')">
+                                <span data-i18n="nav.agentsManagement">Agent管理</span>
                             </div>
                         </div>
                     </div>
-                    <div class="nav-item nav-item-has-submenu" data-page="knowledge">
-                        <div class="nav-item-content" data-title="知识" onclick="window.toggleSubmenu('knowledge')" data-i18n="nav.knowledge" data-i18n-attr="data-title" data-i18n-skip-text="true">
+                    <div class="nav-item nav-item-has-submenu nav-advanced" data-page="roles">
+                        <div class="nav-item-content" data-title="角色" onclick="window.toggleSubmenu('roles')" data-i18n="nav.roles" data-i18n-attr="data-title" data-i18n-skip-text="true">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                             </svg>
-                            <span data-i18n="nav.knowledge">知识</span>
+                            <span data-i18n="nav.roles">角色</span>
                             <svg class="submenu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </div>
                         <div class="nav-submenu">
-                            <div class="nav-submenu-item" data-page="knowledge-retrieval-logs" onclick="switchPage('knowledge-retrieval-logs')">
-                                <span data-i18n="nav.knowledgeRetrievalLogs">检索历史</span>
-                            </div>
-                            <div class="nav-submenu-item" data-page="knowledge-management" onclick="switchPage('knowledge-management')">
-                                <span data-i18n="nav.knowledgeManagement">知识管理</span>
+                            <div class="nav-submenu-item" data-page="roles-management" onclick="switchPage('roles-management')">
+                                <span data-i18n="nav.rolesManagement">角色管理</span>
                             </div>
                         </div>
                     </div>
-                    <div class="nav-item nav-item-has-submenu" data-page="skills">
+                    <div class="nav-item nav-item-has-submenu nav-advanced" data-page="skills">
                         <div class="nav-item-content" data-title="Skills" onclick="window.toggleSubmenu('skills')" data-i18n="nav.skills" data-i18n-attr="data-title" data-i18n-skip-text="true">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
@@ -358,44 +309,110 @@
                             </div>
                         </div>
                     </div>
-                    <div class="nav-item nav-item-has-submenu" data-page="agents">
-                        <div class="nav-item-content" data-title="Agents" onclick="window.toggleSubmenu('agents')" data-i18n="nav.agents" data-i18n-attr="data-title" data-i18n-skip-text="true">
+                    <div class="nav-item nav-item-has-submenu nav-advanced" data-page="mcp">
+                        <div class="nav-item-content" data-title="MCP" onclick="window.toggleSubmenu('mcp')" data-i18n="nav.mcp" data-i18n-attr="data-title" data-i18n-skip-text="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                            </svg>
+                            <span data-i18n="nav.mcp">MCP</span>
+                            <svg class="submenu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="nav-submenu">
+                            <div class="nav-submenu-item" data-page="mcp-monitor" onclick="switchPage('mcp-monitor')">
+                                <span data-i18n="nav.mcpMonitor">MCP状态监控</span>
+                            </div>
+                            <div class="nav-submenu-item" data-page="mcp-management" onclick="switchPage('mcp-management')">
+                                <span data-i18n="nav.mcpManagement">MCP管理</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="nav-item nav-item-has-submenu nav-advanced" data-page="knowledge">
+                        <div class="nav-item-content" data-title="知识" onclick="window.toggleSubmenu('knowledge')" data-i18n="nav.knowledge" data-i18n-attr="data-title" data-i18n-skip-text="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                            </svg>
+                            <span data-i18n="nav.knowledge">知识</span>
+                            <svg class="submenu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="nav-submenu">
+                            <div class="nav-submenu-item" data-page="knowledge-retrieval-logs" onclick="switchPage('knowledge-retrieval-logs')">
+                                <span data-i18n="nav.knowledgeRetrievalLogs">检索历史</span>
+                            </div>
+                            <div class="nav-submenu-item" data-page="knowledge-management" onclick="switchPage('knowledge-management')">
+                                <span data-i18n="nav.knowledgeManagement">知识管理</span>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="nav-category-group">
+                        <div class="nav-category-label nav-advanced">Operations</div>
+                    <div class="nav-item nav-advanced" data-page="info-collect">
+                        <div class="nav-item-content" data-title="信息收集" onclick="switchPage('info-collect')" data-i18n="nav.infoCollect" data-i18n-attr="data-title" data-i18n-skip-text="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <span data-i18n="nav.infoCollect">信息收集</span>
+                        </div>
+                    </div>
+                    <div class="nav-item nav-advanced" data-page="workflows">
+                        <div class="nav-item-content" data-title="工作流" onclick="switchPage('workflows')" data-i18n="nav.workflows" data-i18n-attr="data-title" data-i18n-skip-text="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="8" height="8" rx="2"/>
+                                <path d="M7 11v4a2 2 0 0 0 2 2h4"/>
+                                <rect x="13" y="13" width="8" height="8" rx="2"/>
+                            </svg>
+                            <span data-i18n="nav.workflows">工作流</span>
+                        </div>
+                    </div>
+                    <div class="nav-item nav-advanced" data-page="projects">
+                        <div class="nav-item-content" data-title="项目管理" onclick="switchPage('projects')" data-i18n="nav.projects" data-i18n-attr="data-title" data-i18n-skip-text="true">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
                                 <polyline points="2 17 12 22 22 17"></polyline>
                                 <polyline points="2 12 12 17 22 12"></polyline>
                             </svg>
-                            <span data-i18n="nav.agents">Agents</span>
-                            <svg class="submenu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <div class="nav-submenu">
-                            <div class="nav-submenu-item" data-page="agents-management" onclick="switchPage('agents-management')">
-                                <span data-i18n="nav.agentsManagement">Agent管理</span>
-                            </div>
+                            <span data-i18n="nav.projects">项目管理</span>
                         </div>
                     </div>
-                    <div class="nav-item nav-item-has-submenu" data-page="roles">
-                        <div class="nav-item-content" data-title="角色" onclick="window.toggleSubmenu('roles')" data-i18n="nav.roles" data-i18n-attr="data-title" data-i18n-skip-text="true">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <div class="nav-item nav-advanced" data-page="hitl">
+                        <div class="nav-item-content" data-title="人机协同" onclick="switchPage('hitl')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="9" cy="7" r="4"></circle>
-                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                <path d="m16 11 2 2 4-4"></path>
                             </svg>
-                            <span data-i18n="nav.roles">角色</span>
-                            <svg class="submenu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <div class="nav-submenu">
-                            <div class="nav-submenu-item" data-page="roles-management" onclick="switchPage('roles-management')">
-                                <span data-i18n="nav.rolesManagement">角色管理</span>
-                            </div>
+                            <span data-i18n="nav.hitl">人机协同</span>
                         </div>
                     </div>
-                    <div class="nav-item" data-page="platform-rbac">
+                    <div class="nav-item nav-advanced" data-page="dashboard">
+                        <div class="nav-item-content" data-title="仪表盘" onclick="switchPage('dashboard')" data-i18n="nav.dashboard" data-i18n-attr="data-title" data-i18n-skip-text="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="7" height="9"></rect>
+                                <rect x="14" y="3" width="7" height="5"></rect>
+                                <rect x="14" y="12" width="7" height="9"></rect>
+                                <rect x="3" y="16" width="7" height="5"></rect>
+                            </svg>
+                            <span data-i18n="nav.dashboard">仪表盘</span>
+                        </div>
+                    </div>
+                    <div class="nav-item nav-advanced" data-page="chat-files">
+                        <div class="nav-item-content" data-title="文件管理" onclick="switchPage('chat-files')" data-i18n="nav.chatFiles" data-i18n-attr="data-title" data-i18n-skip-text="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span data-i18n="nav.chatFiles">文件管理</span>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="nav-category-group">
+                        <div class="nav-category-label nav-advanced">Administration</div>
+                    <div class="nav-item nav-advanced" data-page="platform-rbac">
                         <div class="nav-item-content" data-title="平台权限" onclick="switchPage('platform-rbac')" data-i18n="nav.platformRbac" data-i18n-attr="data-title" data-i18n-skip-text="true">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="7.5" cy="14.5" r="3.5"></circle>
@@ -410,7 +427,7 @@
                             <span data-i18n="nav.platformRbac">平台权限</span>
                         </div>
                     </div>
-                    <div class="nav-item" data-page="settings">
+                    <div class="nav-item nav-advanced" data-page="settings">
                         <div class="nav-item-content" data-title="系统设置" onclick="switchPage('settings')" data-i18n="nav.settings" data-i18n-attr="data-title" data-i18n-skip-text="true">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="3"></circle>
@@ -418,6 +435,7 @@
                             </svg>
                             <span data-i18n="nav.settings">系统设置</span>
                         </div>
+                    </div>
                     </div>
                 </nav>
             </aside>
@@ -660,6 +678,13 @@
                                                         <span class="dashboard-severity-status-label" data-i18n="dashboard.statusFalsePositive">误报</span>
                                                     </div>
                                                 </div>
+                                            </div>
+                                            <div class="status-cell-legend">
+                                                <span class="status-cell-legend-item"><span class="status-cell-legend-swatch s-open"></span>Open</span>
+                                                <span class="status-cell-legend-item"><span class="status-cell-legend-swatch s-confirmed"></span>Confirmed</span>
+                                                <span class="status-cell-legend-item"><span class="status-cell-legend-swatch s-fixed"></span>Fixed</span>
+                                                <span class="status-cell-legend-item"><span class="status-cell-legend-swatch s-ignored"></span>Ignored</span>
+                                                <span class="status-cell-legend-item"><span class="status-cell-legend-swatch s-fp"></span>False positive</span>
                                             </div>
                                             <div class="dashboard-severity-progress">
                                                 <div class="dashboard-severity-progress-meta">
@@ -6037,6 +6062,7 @@
     <script src="/static/js/i18n.js"></script>
     <script src="/static/js/theme.js"></script>
     <script src="/static/js/builtin-tools.js"></script>
+    <script src="/static/js/tool-plain-names.js"></script>
     <script src="/static/js/auth.js"></script>
     <script src="/static/js/modal.js"></script>
     <script src="/static/js/notifications.js"></script>

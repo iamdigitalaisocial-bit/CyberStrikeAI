@@ -90,8 +90,8 @@ function initRouter() {
         }
     }
     
-    // 默认显示仪表盘
-    switchPage('dashboard');
+    // 默认显示对话（Chat 是主入口，仪表盘移到 Advanced 分组内）
+    switchPage('chat');
 }
 
 // 切换页面
