@@ -963,7 +963,7 @@ function renderRoleToolsList() {
                    onchange="handleRoleToolCheckboxChange('${escapeHtml(toolKey)}', this.checked)" />
             <div class="role-tool-item-info">
                 <div class="role-tool-item-name">
-                    ${escapeHtml(tool.name)}
+                    ${escapeHtml(typeof withPlainToolName === 'function' ? withPlainToolName(tool.name) : tool.name)}
                     ${externalBadge}
                     ${mcpDisabledBadge}
                 </div>

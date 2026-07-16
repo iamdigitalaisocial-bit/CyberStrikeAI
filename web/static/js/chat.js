@@ -1780,7 +1780,7 @@ function renderMentionSuggestions({ showLoading = false } = {}) {
         const toolEnabled = tool.roleEnabled !== undefined ? tool.roleEnabled : tool.enabled;
         const disabledClass = toolEnabled ? '' : 'disabled';
         const badge = tool.isExternal ? '<span class="mention-item-badge">外部</span>' : '<span class="mention-item-badge internal">内置</span>';
-        const nameHtml = escapeHtml(tool.name);
+        const nameHtml = escapeHtml(typeof withPlainToolName === 'function' ? withPlainToolName(tool.name) : tool.name);
         const description = tool.description && tool.description.length > 0 ? escapeHtml(tool.description) : (typeof window.t === 'function' ? window.t('chat.noDescription') : '暂无描述');
         const descHtml = `<div class="mention-item-desc">${description}</div>`;
         // 根据工具在当前角色中的启用状态显示状态标签

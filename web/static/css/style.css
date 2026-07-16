@@ -39899,3 +39899,254 @@ html[data-theme="dark"] .workflow-toolbar #workflow-connect-btn[aria-pressed="tr
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+/* ============================================================
+   CyberStrikeAI restyle — categorized nav + refreshed dark palette
+   Palette source: OpenCTI production ThemeDark.ts (reference only,
+   no OpenCTI code used) — near-black navy surfaces, cyan/green
+   accents, distinct error/warning/success/info severity colors.
+   ============================================================ */
+
+html[data-theme="dark"] {
+    --bg-primary: #070d19;
+    --bg-secondary: #09101e;
+    --bg-tertiary: #0f1e38;
+    --accent-color: #0fbcff;
+    --accent-hover: #4dccff;
+    --text-primary: #F2F2F3;
+    --success-color: #17AB1F;
+    --warning-color: #E6700F;
+    --error-color: #F14337;
+    --border-color: #1c2740;
+}
+
+/* Advanced nav items: hidden by default, revealed when expanded */
+.nav-advanced {
+    display: none;
+}
+#main-sidebar-nav.nav-advanced-expanded .nav-advanced {
+    display: block;
+    animation: nav-advanced-in 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+#main-sidebar-nav.nav-advanced-expanded .nav-category-group {
+    display: block;
+}
+@keyframes nav-advanced-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.nav-category-label {
+    padding: 12px 20px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted, #6b7280);
+    display: none;
+}
+#main-sidebar-nav.nav-advanced-expanded .nav-category-label {
+    display: block;
+}
+#main-sidebar-nav.nav-advanced-expanded .nav-category-label ~ .nav-category-label {
+    margin-top: 4px;
+}
+
+.nav-advanced-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    user-select: none;
+    border-top: 1px solid var(--border-color);
+}
+.nav-advanced-toggle:hover {
+    color: var(--text-primary);
+}
+.nav-advanced-caret {
+    transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.nav-advanced-toggle-open .nav-advanced-caret {
+    transform: rotate(90deg);
+}
+
+/* Indent advanced items under their category, like a real grouped menu */
+.nav-advanced.nav-item {
+    margin-left: 8px;
+}
+
+/* Severity badges reuse OpenCTI's bright/dark pairing */
+.severity-critical, .badge-critical {
+    color: #F14337;
+    background: rgba(241, 67, 55, 0.15);
+    border: 1px solid rgba(241, 67, 55, 0.3);
+}
+.severity-high, .badge-high {
+    color: #E6700F;
+    background: rgba(230, 112, 15, 0.15);
+    border: 1px solid rgba(230, 112, 15, 0.3);
+}
+.severity-medium, .badge-medium {
+    color: #F2BE3A;
+    background: rgba(242, 190, 58, 0.15);
+    border: 1px solid rgba(242, 190, 58, 0.3);
+}
+.severity-low, .badge-low, .severity-info, .badge-info {
+    color: #4DCCFF;
+    background: rgba(77, 204, 255, 0.12);
+    border: 1px solid rgba(77, 204, 255, 0.25);
+}
+
+/* ============================================================
+   Sharp, solid, tactile treatment — no soft/rounded "assistant" look.
+   Flattens corners and adds real pressed-state feedback on the
+   nav, cards, and buttons the user actually interacts with.
+   Deliberately scoped (not a blanket *-selector) so we don't
+   flatten legitimate circular elements (avatars, status dots)
+   elsewhere in the app that haven't been reviewed.
+   ============================================================ */
+
+.nav-category-group {
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 0;
+    margin: 4px 12px;
+    padding: 4px 0 8px;
+}
+.nav-category-group + .nav-category-group {
+    margin-top: 8px;
+}
+
+.nav-item,
+.nav-item-content,
+.nav-advanced-toggle,
+.nav-category-group {
+    border-radius: 0 !important;
+}
+
+.nav-item-content:active,
+.nav-advanced-toggle:active {
+    background: rgba(15, 188, 255, 0.18) !important;
+    transform: translateY(1px);
+}
+
+.stat-card,
+.dashboard-kpi-card {
+    border-radius: 0 !important;
+    border: 1px solid var(--border-color);
+}
+.stat-card:active,
+.dashboard-kpi-card:active {
+    transform: translateY(1px);
+    border-color: var(--accent-color);
+}
+
+button,
+.btn {
+    border-radius: 0 !important;
+}
+button:active,
+.btn:active {
+    transform: translateY(1px);
+    filter: brightness(0.92);
+}
+
+/* Fix: long nav labels (e.g. "WebShell Management") overflowing their
+   category box now that groups have visible borders — truncate cleanly
+   instead of spilling outside the container. */
+.nav-category-group .nav-item-content {
+    padding-right: 16px;
+}
+.nav-category-group .nav-item-content span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    flex: 1;
+}
+.nav-category-group .nav-item-content svg {
+    flex-shrink: 0;
+}
+
+/* Real fix: .nav-item-content itself (not just its text) was wider than
+   the category-group container — force width containment at every level. */
+.nav-category-group,
+.nav-category-group .nav-item,
+.nav-category-group .nav-item-content {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.nav-category-group .nav-item-content {
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Vulnerability status cells: solid color fill per status instead of
+   cramming a number + text label into a tiny box. Meaning is explained
+   once, clearly, in a legend below — not squeezed into every cell. */
+.dashboard-severity-status-cell.s-open       { background: #F14337; border-color: #F14337; }
+.dashboard-severity-status-cell.s-confirmed  { background: #E6700F; border-color: #E6700F; }
+.dashboard-severity-status-cell.s-fixed      { background: #17AB1F; border-color: #17AB1F; }
+.dashboard-severity-status-cell.s-ignored    { background: #4b5563; border-color: #4b5563; }
+.dashboard-severity-status-cell.s-fp         { background: #334155; border-color: #334155; }
+
+.dashboard-severity-status-cell .dashboard-severity-status-value {
+    color: #ffffff !important;
+    font-size: 1.5rem;
+}
+.dashboard-severity-status-cell .dashboard-severity-status-icon,
+.dashboard-severity-status-cell .dashboard-severity-status-label {
+    display: none;
+}
+.dashboard-severity-status-cell {
+    border-radius: 0 !important;
+    min-height: 52px;
+}
+
+.status-cell-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 10px 2px 4px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+.status-cell-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.status-cell-legend-swatch {
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    flex-shrink: 0;
+}
+.status-cell-legend-swatch.s-open      { background: #F14337; }
+.status-cell-legend-swatch.s-confirmed { background: #E6700F; }
+.status-cell-legend-swatch.s-fixed     { background: #17AB1F; }
+.status-cell-legend-swatch.s-ignored   { background: #4b5563; }
+.status-cell-legend-swatch.s-fp        { background: #334155; }
+
+/* Category-group containers should be fully hidden when collapsed,
+   not just their contents — otherwise empty padding/border strips show. */
+.nav-category-group {
+    display: none;
+}
+#main-sidebar-nav.nav-advanced-expanded .nav-category-group {
+    display: block;
+}
+
+/* Override the pre-existing dark-theme !important rules that were
+   silently winning over the earlier solid-color attempt (verified via
+   computed styles — this exact selector + !important is required to
+   actually beat the app's own html[data-theme="dark"] rule). */
+html[data-theme="dark"] .dashboard-severity-status-cell.s-open       { background: #F14337 !important; border-color: #F14337 !important; }
+html[data-theme="dark"] .dashboard-severity-status-cell.s-confirmed  { background: #E6700F !important; border-color: #E6700F !important; }
+html[data-theme="dark"] .dashboard-severity-status-cell.s-fixed      { background: #17AB1F !important; border-color: #17AB1F !important; }
+html[data-theme="dark"] .dashboard-severity-status-cell.s-ignored    { background: #4b5563 !important; border-color: #4b5563 !important; }
+html[data-theme="dark"] .dashboard-severity-status-cell.s-fp         { background: #334155 !important; border-color: #334155 !important; }
