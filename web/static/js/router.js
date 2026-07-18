@@ -1,5 +1,5 @@
 // 页面路由管理
-let currentPage = 'dashboard';
+let currentPage = 'chat';
 
 /** chat、漏洞管理页在切换时保留当前 hash 上的查询串（如 ?conversation= / ?conversation_id=） */
 function buildHashForPage(pageId) {
@@ -220,6 +220,20 @@ function updateNavState(pageId) {
         if (navItem) {
             navItem.classList.add('active');
         }
+    }
+
+    expandAdvancedNavIfActiveInside();
+}
+
+/** 若当前激活的导航项位于 Advanced 分组内，自动展开该分组，避免直达链接后侧栏无高亮项 */
+function expandAdvancedNavIfActiveInside() {
+    const sidebarNav = document.getElementById('main-sidebar-nav');
+    const toggle = document.getElementById('nav-advanced-toggle');
+    if (!sidebarNav) return;
+    const activeInsideGroup = sidebarNav.querySelector('.nav-category-group .nav-item.active');
+    if (activeInsideGroup) {
+        sidebarNav.classList.add('nav-advanced-expanded');
+        if (toggle) toggle.classList.add('nav-advanced-toggle-open');
     }
 }
 
@@ -570,6 +584,18 @@ function toggleSidebar() {
 }
 window.toggleSidebar = toggleSidebar;
 
+// 切换侧边栏 Advanced 分组展开/收起，并持久化状态（同 toggleSidebar 约定）
+function toggleAdvancedNav() {
+    const sidebarNav = document.getElementById('main-sidebar-nav');
+    const toggle = document.getElementById('nav-advanced-toggle');
+    if (!sidebarNav) return;
+    sidebarNav.classList.toggle('nav-advanced-expanded');
+    if (toggle) toggle.classList.toggle('nav-advanced-toggle-open');
+    const isExpanded = sidebarNav.classList.contains('nav-advanced-expanded');
+    localStorage.setItem('navAdvancedExpanded', isExpanded ? 'true' : 'false');
+}
+window.toggleAdvancedNav = toggleAdvancedNav;
+
 // 初始化侧边栏状态
 function initSidebarState() {
     const sidebar = document.getElementById('main-sidebar');
@@ -578,6 +604,12 @@ function initSidebarState() {
         if (savedState === 'true') {
             sidebar.classList.add('collapsed');
         }
+    }
+    const sidebarNav = document.getElementById('main-sidebar-nav');
+    if (sidebarNav && localStorage.getItem('navAdvancedExpanded') === 'true') {
+        sidebarNav.classList.add('nav-advanced-expanded');
+        const toggle = document.getElementById('nav-advanced-toggle');
+        if (toggle) toggle.classList.add('nav-advanced-toggle-open');
     }
     initConversationSidebarState();
 }

@@ -1251,7 +1251,8 @@ function renderToolsList() {
         updateToolsStats();
         return;
     }
-    
+
+    const hasPlainToolNames = typeof withPlainToolName === 'function';
     allTools.forEach(tool => {
         const toolKey = getToolKey(tool); // 生成唯一标识符
         const toolItem = document.createElement('div');
@@ -1290,7 +1291,7 @@ function renderToolsList() {
             <input type="checkbox" id="${checkboxId}" ${toolState.enabled ? 'checked' : ''} ${toolState.is_external || tool.is_external ? 'data-external="true"' : ''} onchange="handleToolCheckboxChange('${escapeHtml(toolKey)}', this.checked)" />
             <div class="tool-item-info">
                 <div class="tool-item-name">
-                    ${escapeHtml(tool.name)}
+                    ${escapeHtml(hasPlainToolNames ? withPlainToolName(tool.name) : tool.name)}
                     ${externalBadge}
                     <label class="tool-resident-toggle" title="${typeof window.t === 'function' ? window.t('mcp.alwaysVisibleHint') : '始终常驻在 Tool Search 可见列表'}" onclick="event.stopPropagation()">
                         <input type="checkbox" ${alwaysVisibleChecked ? 'checked' : ''} ${alwaysVisibleLocked ? 'disabled' : ''} onchange="handleToolAlwaysVisibleChange('${escapeHtml(toolKey)}', this.checked)" />

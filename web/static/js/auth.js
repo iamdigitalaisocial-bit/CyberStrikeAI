@@ -499,6 +499,14 @@ function applyRBACToUI(root) {
         el.hidden = !allowed;
         el.setAttribute('aria-hidden', allowed ? 'false' : 'true');
     });
+    // A sidebar category group whose every nav item just got hidden above
+    // would otherwise sit visible as an empty bordered box with an orphaned
+    // label — hide the whole group when nothing inside it is left visible.
+    document.querySelectorAll('.nav-category-group').forEach((group) => {
+        const hasVisibleItem = Array.from(group.querySelectorAll('.nav-item[data-page]'))
+            .some((item) => !item.hidden);
+        group.hidden = !hasVisibleItem;
+    });
     const permissionRoot = root instanceof Element ? root : document;
     permissionRoot.querySelectorAll('[data-require-permission], [data-require-permission-any]').forEach(applyPermissionElement);
     if (permissionRoot instanceof Element && permissionRoot.matches('[data-require-permission], [data-require-permission-any]')) {

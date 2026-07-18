@@ -205,7 +205,7 @@
                             <span data-i18n="nav.vulnerabilities">漏洞管理</span>
                         </div>
                     </div>
-                    <div class="nav-advanced-toggle" id="nav-advanced-toggle" onclick="document.getElementById('main-sidebar-nav').classList.toggle('nav-advanced-expanded'); this.classList.toggle('nav-advanced-toggle-open')">
+                    <div class="nav-advanced-toggle" id="nav-advanced-toggle" onclick="toggleAdvancedNav()">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-advanced-caret">
                             <path d="M9 18l6-6-6-6"/>
                         </svg>
@@ -443,7 +443,7 @@
             <!-- 内容区域 -->
             <div class="content-area">
                 <!-- 仪表盘页面 -->
-                <div id="page-dashboard" class="page active">
+                <div id="page-dashboard" class="page">
                     <div class="dashboard-page">
                         <div class="page-header">
                             <h2 data-i18n="dashboard.title">仪表盘</h2>
@@ -634,48 +634,28 @@
                                         <div class="dashboard-severity-status">
                                             <div class="dashboard-severity-status-grid">
                                                 <div class="dashboard-severity-status-cell s-open" role="button" tabindex="0" onclick="navigateToVulnerabilitiesWithFilter({status:'open'})" onkeydown="if(event.key==='Enter'||event.key===' ') { event.preventDefault(); navigateToVulnerabilitiesWithFilter({status:'open'}); }">
-                                                    <span class="dashboard-severity-status-icon" aria-hidden="true">
-                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                                                    </span>
                                                     <div class="dashboard-severity-status-text">
                                                         <span class="dashboard-severity-status-value" id="dashboard-status-open">0</span>
-                                                        <span class="dashboard-severity-status-label" data-i18n="dashboard.statusOpen">待处理</span>
                                                     </div>
                                                 </div>
                                                 <div class="dashboard-severity-status-cell s-confirmed" role="button" tabindex="0" onclick="navigateToVulnerabilitiesWithFilter({status:'confirmed'})" onkeydown="if(event.key==='Enter'||event.key===' ') { event.preventDefault(); navigateToVulnerabilitiesWithFilter({status:'confirmed'}); }">
-                                                    <span class="dashboard-severity-status-icon" aria-hidden="true">
-                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                                                    </span>
                                                     <div class="dashboard-severity-status-text">
                                                         <span class="dashboard-severity-status-value" id="dashboard-status-confirmed">0</span>
-                                                        <span class="dashboard-severity-status-label" data-i18n="dashboard.statusConfirmed">已确认</span>
                                                     </div>
                                                 </div>
                                                 <div class="dashboard-severity-status-cell s-fixed" role="button" tabindex="0" onclick="navigateToVulnerabilitiesWithFilter({status:'fixed'})" onkeydown="if(event.key==='Enter'||event.key===' ') { event.preventDefault(); navigateToVulnerabilitiesWithFilter({status:'fixed'}); }">
-                                                    <span class="dashboard-severity-status-icon" aria-hidden="true">
-                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-                                                    </span>
                                                     <div class="dashboard-severity-status-text">
                                                         <span class="dashboard-severity-status-value" id="dashboard-status-fixed">0</span>
-                                                        <span class="dashboard-severity-status-label" data-i18n="dashboard.statusFixed">已修复</span>
                                                     </div>
                                                 </div>
                                                 <div class="dashboard-severity-status-cell s-ignored" role="button" tabindex="0" onclick="navigateToVulnerabilitiesWithFilter({status:'ignored'})" onkeydown="if(event.key==='Enter'||event.key===' ') { event.preventDefault(); navigateToVulnerabilitiesWithFilter({status:'ignored'}); }">
-                                                    <span class="dashboard-severity-status-icon" aria-hidden="true">
-                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16"/><path d="M10.58 10.58A3 3 0 0 0 12 15a3 3 0 0 0 2.12-.88"/><path d="M9.88 4.24A9.77 9.77 0 0 1 12 4c7 0 10 8 10 8a18.5 18.5 0 0 1-2.5 3.66"/><path d="M6.61 6.61C3.98 8.38 2 12 2 12s3 8 10 8a9.86 9.86 0 0 0 5.39-1.61"/></svg>
-                                                    </span>
                                                     <div class="dashboard-severity-status-text">
                                                         <span class="dashboard-severity-status-value" id="dashboard-status-ignored">0</span>
-                                                        <span class="dashboard-severity-status-label" data-i18n="dashboard.statusIgnored">已忽略</span>
                                                     </div>
                                                 </div>
                                                 <div class="dashboard-severity-status-cell s-fp" role="button" tabindex="0" onclick="navigateToVulnerabilitiesWithFilter({status:'false_positive'})" onkeydown="if(event.key==='Enter'||event.key===' ') { event.preventDefault(); navigateToVulnerabilitiesWithFilter({status:'false_positive'}); }">
-                                                    <span class="dashboard-severity-status-icon" aria-hidden="true">
-                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-                                                    </span>
                                                     <div class="dashboard-severity-status-text">
                                                         <span class="dashboard-severity-status-value" id="dashboard-status-fp">0</span>
-                                                        <span class="dashboard-severity-status-label" data-i18n="dashboard.statusFalsePositive">误报</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -893,7 +873,7 @@
                 </div>
 
                 <!-- 对话页面 -->
-                <div id="page-chat" class="page">
+                <div id="page-chat" class="page active">
                     <div class="chat-page-layout">
                         <!-- 历史对话侧边栏（可折叠，与主导航侧边栏类似） -->
                         <aside class="conversation-sidebar" id="conversation-sidebar">

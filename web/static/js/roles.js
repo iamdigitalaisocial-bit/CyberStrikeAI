@@ -925,7 +925,8 @@ function renderRoleToolsList() {
     }
 
     const chkTitle = escapeHtml(_t('roleModal.checkboxLinkTitle'));
-    
+    const hasPlainToolNames = typeof withPlainToolName === 'function';
+
     allRoleTools.forEach(tool => {
         const toolKey = getToolKey(tool);
         const toolItem = document.createElement('div');
@@ -963,7 +964,7 @@ function renderRoleToolsList() {
                    onchange="handleRoleToolCheckboxChange('${escapeHtml(toolKey)}', this.checked)" />
             <div class="role-tool-item-info">
                 <div class="role-tool-item-name">
-                    ${escapeHtml(typeof withPlainToolName === 'function' ? withPlainToolName(tool.name) : tool.name)}
+                    ${escapeHtml(hasPlainToolNames ? withPlainToolName(tool.name) : tool.name)}
                     ${externalBadge}
                     ${mcpDisabledBadge}
                 </div>
